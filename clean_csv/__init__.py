@@ -25,5 +25,20 @@ console = Console()
 
 
 
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(
+        prog="clean_csv",
+        description="CleanCSV Pro: fix messy CSV files (encoding/BOM, headers, validation, Shopify mode, batching).",
+    )
+    p.add_argument("input", help="Input CSV/TSV file path")
+    p.add_argument("--out", default=None, help="Output CSV path (single file mode)")
+    p.add_argument("--out-dir", default=None, help="Output directory (batch mode)")
+    p.add_argument("--delimiter", default=None, help="Override delimiter: ',', '\\t', ';', '|' (auto by default)")
+    p.add_argument("--encoding", default=None, help="Override input encoding (auto by default)")
+
+    p.add_argument("--shopify", action="store_true", help="Apply Shopify-specific fixes")
+    p.add_argument("--required", default=None, help="Comma-separated required columns (rows missing are dropped)")
+    p.add_argument("--drop-empty-title", action="store_true", help="Drop rows where Title is missing/blank (generic)")
+
 
 
