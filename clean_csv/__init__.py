@@ -140,5 +140,17 @@ def main(argv: Optional[List[str]] = None) -> None:
         rep_dir.mkdir(parents=True, exist_ok=True)
 
 
+        combined_path = rep_dir / "clean_report.json"
+        save_report_json(report, str(combined_path))
 
+        for br in batch_reports:
+            save_report_json(br, str(rep_dir / f"clean_report_batch_{br.batch_index:03d}.json"))
+
+        console.print(f"[green]Wrote[/green] {len(batches)} batch file(s) to: {out_dir}")
+        console.print(f"[green]Reports[/green] written to: {rep_dir}")
+    else:
+        write_csv_utf8(df, str(out_path))
+        save_report_json(report, report_target)
+        console.print(f"[green]Wrote cleaned file:[/green] {out_path}")
+        console.print(f"[green]Report written:[/green] {report_target}")
 
