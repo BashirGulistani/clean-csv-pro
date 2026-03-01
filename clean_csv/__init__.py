@@ -41,4 +41,19 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--drop-empty-title", action="store_true", help="Drop rows where Title is missing/blank (generic)")
 
 
+    p.add_argument("--trim", action="store_true", help="Trim whitespace in all string cells")
+    p.add_argument("--normalize-nulls", action="store_true", help="Convert common null-like values to empty string")
+
+    p.add_argument("--price-cols", default=None, help="Comma-separated list of price columns to normalize")
+    p.add_argument("--round-up-005", action="store_true", help="Round UP prices to nearest 0.05 (ends in 0/5 cents)")
+
+    p.add_argument("--batch-size", type=int, default=0, help="If >0, split into batches of N rows (handle-safe)")
+    p.add_argument("--handle-col", default="Handle", help="Grouping key for batching (default: Handle)")
+
+    p.add_argument("--report", default=None, help="Report JSON path (single file) or directory (batch mode)")
+    p.add_argument("--dry-run", action="store_true", help="Compute/report changes without writing outputs")
+
+    return p
+
+
 
