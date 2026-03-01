@@ -97,6 +97,48 @@ def main(argv: Optional[List[str]] = None) -> None:
 
 
 
+    required_cols = parse_csv_list(args.required) if args.required else []
+    if args.drop_empty_title and "Title" not in required_cols:
+        required_cols.append("Title")
+
+    if required_cols:
+        df, changes = drop_rows_missing_required(df, required_cols)
+        report.add_section("required", changes)
+
+    if args.shopify:
+        df, changes = apply_shopify_fixes(df)
+        report.add_section("shopify", changes)
+
+    price_cols = parse_csv_list(args.price_cols) if args.price_cols else []
+    if args.round_up_005 and price_cols:
+        df, changes = normalize_prices_round_up_to_005(df, price_cols)
+        report.add_section("prices", changes)
+    elif args.round_up_005 and not price_cols:
+        report.warn("round_up_005 enabled but --price-cols not provided; skipping price normalization.")
+
+    report.note("rows_out", int(len(df)))
+    report.note("cols_out", int(len(df.columns)))
+
+    if args.dry_run:
+        console.print("[yellow]Dry-run enabled: not writing output files.[/yellow]")
+        save_report_json(report, report_target)
+        console.print(f"[green]Report written:[/green] {report_target}")
+        return
+
+    if batch_mode:
+        batches = split_into_handle_batches(df, handle_col=args.handle_col, batch_size=args.batch_size or 5000)
+        batch_reports = []
+        for i, bdf in enumerate(batches, start=1):
+            out_file = out_dir / f"{in_path.stem}_clean_batch_{i:03d}.csv"
+            write_csv_utf8(bdf, str(out_file))
+            b_rep = report.clone_for_batch(batch_index=i, output_path=str(out_file), rows=int(len(bdf)))
+            batch_reports.append(b_rep)
+
+        rep_dir = Path(report_target) if report_target.endswith(os.sep) else Path(report_target)
+        if rep_dir.suffix.lower() == ".json":
+            rep_dir = rep_dir.parent
+        rep_dir.mkdir(parents=True, exist_ok=True)
+
 
 
 
