@@ -56,4 +56,47 @@ def build_parser() -> argparse.ArgumentParser:
     return p
 
 
+def main(argv: Optional[List[str]] = None) -> None:
+    args = build_parser().parse_args(argv)
+
+    in_path = Path(args.input)
+    if not in_path.exists():
+        raise SystemExit(f"Input not found: {in_path}")
+
+    batch_mode = bool(args.out_dir) or (args.batch_size and args.batch_size > 0)
+    if batch_mode:
+        out_dir = Path(args.out_dir or (in_path.parent / (in_path.stem + "_batches")))
+        out_dir.mkdir(parents=True, exist_ok=True)
+    else:
+        out_path = Path(args.out or guess_default_out(in_path))
+
+    report_target = args.report
+    if not report_target:
+        report_target = str((out_dir if batch_mode else out_path.parent) / "clean_report.json")
+
+    df, read_meta = read_table_safely(
+        in_path=str(in_path),
+        encoding_override=args.encoding,
+        delimiter_override=args.delimiter,
+    )
+
+    report = Report(input_path=str(in_path), read_meta=read_meta)
+    report.note("rows_in", int(len(df)))
+    report.note("cols_in", int(len(df.columns)))
+
+    df, header_changes = clean_headers(df)
+    report.add_section("headers", header_changes)
+
+    if args.trim:
+        df, changes = trim_all_string_cells(df)
+        report.add_section("trim", changes)
+
+    if args.normalize_nulls:
+        df, changes = normalize_null_like_cells(df)
+        report.add_section("normalize_nulls", changes)
+
+
+
+
+
 
