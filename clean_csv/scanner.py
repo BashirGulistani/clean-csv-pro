@@ -138,4 +138,11 @@ def build_inventory(theme_dir: Path, files: List[Path]) -> Inventory:
 
 
 
+def run_text_rules(relpath: str, text: str, inv: Inventory) -> List[Finding]:
+    out: List[Finding] = []
+    for rule in RULES:
+        if rule.applies_to == "text":
+            out.extend(rule.check(relpath, text, inv))
+    return out
+
 
