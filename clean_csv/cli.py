@@ -26,3 +26,17 @@ def main(argv=None) -> int:
     scan.add_argument("--max-bytes", type=int, default=15_000_000, help="Safety limit on total bytes read")
 
 
+    args = p.parse_args(argv)
+
+    if args.cmd == "scan":
+        theme_dir = Path(args.path).expanduser().resolve()
+        if not theme_dir.exists() or not theme_dir.is_dir():
+            print(f"[error] Not a directory: {theme_dir}", file=sys.stderr)
+            return 2
+
+        findings = scan_theme(
+            theme_dir=theme_dir,
+            max_files=args.max_files,
+            max_bytes=args.max_bytes,
+        )
+
