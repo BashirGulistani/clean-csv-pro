@@ -66,5 +66,76 @@ def scan_theme(theme_dir: Path, max_files: int = 5000, max_bytes: int = 15_000_0
     return findings
 
 
+@dataclass
+class Inventory:
+    files: List[str]
+    text_files: List[str]
+    asset_files: List[str]
+    assets_by_ext: dict
+    inline_script_hits: List[Tuple[str, int]]
+    inline_style_hits: List[Tuple[str, int]]
+    script_tags: List[Tuple[str, str]] 
+    img_tags: List[Tuple[str, str]]  
+    asset_sizes: dict 
+
+
+def build_inventory(theme_dir: Path, files: List[Path]) -> Inventory:
+    text_files = []
+    asset_files = []
+    assets_by_ext = {}
+    inline_script_hits = []
+    inline_style_hits = []
+    script_tags = []
+    img_tags = []
+    asset_sizes = {}
+
+    script_tag_re = re.compile(r"<script\b[^>]*>", re.IGNORECASE)
+    img_tag_re = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
+
+    inline_script_re = re.compile(r"<script\b[^>]*>(.*?)</script>", re.IGNORECASE | re.DOTALL)
+    inline_style_re = re.compile(r"<style\b[^>]*>(.*?)</style>", re.IGNORECASE | re.DOTALL)
+
+    for fp in files:
+        rel = str(fp.relative_to(theme_dir))
+        ext = fp.suffix.lower()
+
+        if ext in TEXT_EXTS:
+            text_files.append(rel)
+            txt = safe_read_text(fp, limit_bytes=800_000)
+
+
+            for m in script_tag_re.finditer(txt):
+                script_tags.append((rel, m.group(0)))
+
+            for m in img_tag_re.finditer(txt):
+                img_tags.append((rel, m.group(0)))
+
+            for m in inline_script_re.finditer(txt):
+                inline_script_hits.append((rel, len(m.group(1) or "")))
+            for m in inline_style_re.finditer(txt):
+                inline_style_hits.append((rel, len(m.group(1) or "")))
+
+        if ext in ASSET_EXTS:
+            asset_files.append(rel)
+            assets_by_ext.setdefault(ext, 0)
+            assets_by_ext[ext] += 1
+            try:
+                asset_sizes[rel] = fp.stat().st_size
+            except OSError:
+                asset_sizes[rel] = 0
+
+    return Inventory(
+        files=[str(f.relative_to(theme_dir)) for f in files],
+        text_files=text_files,
+        asset_files=asset_files,
+        assets_by_ext=assets_by_ext,
+        inline_script_hits=inline_script_hits,
+        inline_style_hits=inline_style_hits,
+        script_tags=script_tags,
+        img_tags=img_tags,
+        asset_sizes=asset_sizes,
+    )
+
+
 
 
