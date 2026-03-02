@@ -39,4 +39,30 @@ def main(argv=None) -> int:
             max_files=args.max_files,
             max_bytes=args.max_bytes,
         )
+        min_rank = SEV_ORDER[args.min_severity]
+        filtered = [f for f in findings if SEV_ORDER.get(f.severity, 1) >= min_rank]
 
+        print(render_text(filtered))
+
+        md = render_markdown(filtered, theme_dir=str(theme_dir))
+        if args.out:
+            Path(args.out).write_text(md, encoding="utf-8")
+            print(f"[ok] wrote markdown: {args.out}")
+        else:
+
+            pass
+
+        if args.sarif:
+            sarif = to_sarif_json(filtered, repo_root=str(theme_dir))
+            Path(args.sarif).write_text(sarif, encoding="utf-8")
+            print(f"[ok] wrote sarif: {args.sarif}")
+
+        if any(f.severity in ("high", "medium") for f in filtered):
+            return 1
+        return 0
+
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
