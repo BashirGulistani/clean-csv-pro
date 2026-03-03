@@ -101,3 +101,32 @@ def rule_missing_img_alt(file: str, text: str, inv) -> List[Finding]:
 
 
 
+
+def rule_missing_lazy_loading(file: str, text: str, inv) -> List[Finding]:
+    out: List[Finding] = []
+    for m in IMG_TAG_RE.finditer(text):
+        tag = m.group(0)
+        a = _attrs(tag)
+        src = a.get("src", "") or a.get("data-src", "")
+        if not src:
+            continue
+        if m.start() < 2000:
+            continue
+        loading = (a.get("loading", "") or "").lower()
+        if loading not in ("lazy", "eager"):
+            line = text[: m.start()].count("\n") + 1
+            out.append(
+                make_finding(
+                    "PERF001",
+                    "medium",
+                    "Image missing loading hint",
+                    "Consider adding loading=\"lazy\" for below-the-fold images to reduce initial page load.",
+                    file=file,
+                    line=line,
+                    help="If an image is below the fold, loading=\"lazy\" can improve Core Web Vitals by reducing initial network pressure.",
+                )
+            )
+    return out
+
+
+
