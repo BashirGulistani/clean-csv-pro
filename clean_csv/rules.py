@@ -130,3 +130,31 @@ def rule_missing_lazy_loading(file: str, text: str, inv) -> List[Finding]:
 
 
 
+
+
+def rule_render_blocking_scripts(file: str, text: str, inv) -> List[Finding]:
+    out: List[Finding] = []
+    for m in SCRIPT_TAG_RE.finditer(text):
+        tag = m.group(0)
+        a = _attrs(tag)
+        src = a.get("src", "")
+        if not src:
+            continue  
+        has_defer = "defer" in tag.lower()
+        has_async = "async" in tag.lower()
+        if not (has_defer or has_async):
+            line = text[: m.start()].count("\n") + 1
+            out.append(
+                make_finding(
+                    "PERF002",
+                    "high",
+                    "Render-blocking script",
+                    f"Script tag loads {src} without defer/async. This can block rendering.",
+                    file=file,
+                    line=line,
+                    help="Prefer <script defer src=...> for most scripts. Use async only if execution order doesn't matter.",
+                )
+            )
+    return out
+
+
