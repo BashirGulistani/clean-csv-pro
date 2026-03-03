@@ -303,4 +303,37 @@ def rule_excessive_inline_blocks(file: str, _: str, inv) -> List[Finding]:
 
 
 
+RULES: List[Rule] = [
+    Rule(
+        id="A11Y001",
+        title="Image missing alt text",
+        applies_to="text",
+        severity="high",
+        description="Flags <img> tags without alt text.",
+        check=rule_missing_img_alt,
+    ),
+    Rule(
+        id="PERF001",
+        title="Image missing loading hint",
+        applies_to="text",
+        severity="medium",
+        description="Flags below-the-fold <img> tags missing loading attribute.",
+        check=rule_missing_lazy_loading,
+    ),
+    Rule(
+        id="PERF002",
+        title="Render-blocking script",
+        applies_to="text",
+        severity="high",
+        description="Flags <script src> without defer/async.",
+        check=rule_render_blocking_scripts,
+    ),
+    Rule(
+        id="PERF003",
+        title="Large inline script block",
+        applies_to="text",
+        severity="medium",
+        description="Flags large inline script blocks that bloat HTML.",
+        check=rule_inline_script_bloat,
+    ),
 
