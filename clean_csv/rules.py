@@ -241,3 +241,33 @@ def rule_large_raster_assets(file: str, fp: Path, inv) -> List[Finding]:
     return out
 
 
+def rule_asset_count_budget(file: str, _: str, inv) -> List[Finding]:
+    out: List[Finding] = []
+    total_assets = len(inv.asset_files)
+    if total_assets > 600:
+        out.append(
+            make_finding(
+                "BUDGET001",
+                "medium",
+                "High asset count",
+                f"Theme contains {total_assets} image assets. Consider deduping, removing unused, or moving rarely used assets out of the theme.",
+                file="__inventory__",
+                help="Huge asset directories often indicate duplicates and unused images, increasing maintenance burden and sometimes deploy size.",
+            )
+        )
+    if total_assets > 1500:
+        out.append(
+            make_finding(
+                "BUDGET002",
+                "high",
+                "Very high asset count",
+                f"Theme contains {total_assets} image assets. This is unusually high and likely includes many unused files.",
+                file="__inventory__",
+                help="Audit assets/ for duplicates and unused files. Large themes slow down developer workflows and increase risk of mistakes.",
+            )
+        )
+    return out
+
+
+
+
