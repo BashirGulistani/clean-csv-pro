@@ -204,3 +204,40 @@ def rule_inline_style_bloat(file: str, text: str, inv) -> List[Finding]:
     return out
 
 
+
+
+
+def rule_large_raster_assets(file: str, fp: Path, inv) -> List[Finding]:
+    out: List[Finding] = []
+    ext = fp.suffix.lower()
+    if ext not in (".png", ".jpg", ".jpeg", ".gif"):
+        return out
+    try:
+        size = fp.stat().st_size
+    except OSError:
+        return out
+    if size >= 800_000:
+        out.append(
+            make_finding(
+                "PERF010",
+                "medium",
+                "Large raster asset",
+                f"Asset is {size/1024:.0f} KB. Consider WebP/AVIF and proper sizing.",
+                file=file,
+                help="Large images are a top cause of slow LCP. Prefer AVIF/WebP, compress, and avoid uploading oversized originals.",
+            )
+        )
+    if size >= 2_500_000:
+        out.append(
+            make_finding(
+                "PERF011",
+                "high",
+                "Very large raster asset",
+                f"Asset is {size/1024/1024:.2f} MB. Likely oversized/unoptimized.",
+                file=file,
+                help="Resize to actual display size, compress aggressively, and serve modern formats when possible.",
+            )
+        )
+    return out
+
+
