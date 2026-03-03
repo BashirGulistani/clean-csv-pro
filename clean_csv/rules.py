@@ -271,3 +271,36 @@ def rule_asset_count_budget(file: str, _: str, inv) -> List[Finding]:
 
 
 
+
+def rule_excessive_inline_blocks(file: str, _: str, inv) -> List[Finding]:
+    out: List[Finding] = []
+    big_inline_js = sum(1 for _, n in inv.inline_script_hits if n > 20_000)
+    big_inline_css = sum(1 for _, n in inv.inline_style_hits if n > 15_000)
+
+    if big_inline_js >= 3:
+        out.append(
+            make_finding(
+                "PERF020",
+                "medium",
+                "Multiple large inline scripts",
+                f"Found {big_inline_js} large inline <script> blocks across the theme.",
+                file="__inventory__",
+                help="Move JS to assets for caching and reduce HTML payload size. Keep only truly critical code inline.",
+            )
+        )
+    if big_inline_css >= 3:
+        out.append(
+            make_finding(
+                "PERF021",
+                "medium",
+                "Multiple large inline styles",
+                f"Found {big_inline_css} large inline <style> blocks across the theme.",
+                file="__inventory__",
+                help="Move most CSS to assets. If using critical CSS, keep it small and measured.",
+            )
+        )
+    return out
+
+
+
+
