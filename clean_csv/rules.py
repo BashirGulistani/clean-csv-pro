@@ -46,3 +46,32 @@ CheckFn = Callable[[str, Union[str, Path], object], List[Finding]]
 
 
 
+
+@dataclass(frozen=True)
+class Rule:
+    id: str
+    title: str
+    applies_to: str  
+    severity: str
+    description: str
+    check: Callable
+
+
+
+IMG_TAG_RE = re.compile(r"<img\b[^>]*>", re.IGNORECASE)
+ATTR_RE = re.compile(r'(\w[\w:-]*)\s*=\s*(".*?"|\'.*?\'|[^\s>]+)', re.IGNORECASE)
+
+SCRIPT_TAG_RE = re.compile(r"<script\b[^>]*>", re.IGNORECASE)
+
+
+def _attrs(tag: str) -> dict:
+    attrs = {}
+    for m in ATTR_RE.finditer(tag):
+        k = (m.group(1) or "").lower()
+        v = (m.group(2) or "").strip().strip('"').strip("'")
+        attrs[k] = v
+    return attrs
+
+
+
+
