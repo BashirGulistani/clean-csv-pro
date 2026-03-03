@@ -158,3 +158,49 @@ def rule_render_blocking_scripts(file: str, text: str, inv) -> List[Finding]:
     return out
 
 
+
+
+
+
+def rule_inline_script_bloat(file: str, text: str, inv) -> List[Finding]:
+    out: List[Finding] = []
+    inline_script_re = re.compile(r"<script\b[^>]*>(.*?)</script>", re.IGNORECASE | re.DOTALL)
+    for m in inline_script_re.finditer(text):
+        body = m.group(1) or ""
+        if len(body) > 20_000:
+            line = text[: m.start()].count("\n") + 1
+            out.append(
+                make_finding(
+                    "PERF003",
+                    "medium",
+                    "Large inline script block",
+                    f"Inline script block is ~{len(body):,} chars. Consider moving to an asset file for caching and maintainability.",
+                    file=file,
+                    line=line,
+                    help="Large inline JS increases HTML size and prevents long-term caching benefits.",
+                )
+            )
+    return out
+
+
+def rule_inline_style_bloat(file: str, text: str, inv) -> List[Finding]:
+    out: List[Finding] = []
+    inline_style_re = re.compile(r"<style\b[^>]*>(.*?)</style>", re.IGNORECASE | re.DOTALL)
+    for m in inline_style_re.finditer(text):
+        body = m.group(1) or ""
+        if len(body) > 15_000:
+            line = text[: m.start()].count("\n") + 1
+            out.append(
+                make_finding(
+                    "PERF004",
+                    "medium",
+                    "Large inline style block",
+                    f"Inline style block is ~{len(body):,} chars. Consider moving to CSS assets.",
+                    file=file,
+                    line=line,
+                    help="Large inline CSS can bloat HTML and complicate caching. Keep critical CSS small; move the rest to assets.",
+                )
+            )
+    return out
+
+
