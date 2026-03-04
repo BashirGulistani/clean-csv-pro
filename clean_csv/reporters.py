@@ -7,8 +7,6 @@ from .rules import Finding
 
 
 
-
-
 def render_text(findings: List[Finding]) -> str:
     if not findings:
         return "[ok] No findings (at selected severity threshold)."
@@ -22,5 +20,19 @@ def render_text(findings: List[Finding]) -> str:
     if len(findings) > 12:
         lines.append(f"... ({len(findings)-12} more)")
     return "\n".join(lines)
+
+
+def render_markdown(findings: List[Finding], theme_dir: str = "") -> str:
+    c = Counter(f.severity for f in findings)
+    header = [
+        "# ThemeAudit Report",
+        "",
+        f"- Theme: `{theme_dir}`" if theme_dir else "",
+        f"- Findings: **{len(findings)}** (high={c.get('high',0)}, medium={c.get('medium',0)}, low={c.get('low',0)})",
+        "",
+    ]
+    header = [h for h in header if h != ""]
+
+
 
 
