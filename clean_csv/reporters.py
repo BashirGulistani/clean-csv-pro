@@ -33,6 +33,13 @@ def render_markdown(findings: List[Finding], theme_dir: str = "") -> str:
     ]
     header = [h for h in header if h != ""]
 
+    if not findings:
+        return "\n".join(header + ["✅ No findings at the selected severity threshold.", ""])
+
+    rows = [
+        "| Severity | Rule | Title | Location | Message |",
+        "|---|---|---|---|---|",
+    ]
 
 
 
