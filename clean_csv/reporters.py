@@ -42,4 +42,15 @@ def render_markdown(findings: List[Finding], theme_dir: str = "") -> str:
     ]
 
 
+    for f in findings:
+        loc = f"`{f.file}:{f.line}`"
+        msg = (f.message or "").replace("\n", " ").strip()
+        title = (f.title or "").replace("\n", " ").strip()
+        rows.append(f"| **{f.severity}** | `{f.rule_id}` | {title} | {loc} | {msg} |")
+
+    guidance = [
+        "",
+        "## How to fix common issues",
+        "",
+        "- **Missing alt**: add meaningful `alt` text, or `alt=\"\"` if decorative.",
 
