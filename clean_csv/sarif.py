@@ -50,5 +50,21 @@ def to_sarif_json(findings: List[Finding], repo_root: str = "") -> str:
         )
 
 
-
+    sarif = {
+        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+        "version": "2.1.0",
+        "runs": [
+            {
+                "tool": {
+                    "driver": {
+                        "name": "ThemeAudit",
+                        "informationUri": "https://github.com/",
+                        "rules": list(rules.values()),
+                    }
+                },
+                "results": results,
+            }
+        ],
+    }
+    return json.dumps(sarif, indent=2)
 
