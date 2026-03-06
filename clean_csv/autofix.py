@@ -91,3 +91,37 @@ def _likely_below_fold(tag_start_index: int) -> bool:
 
 
 
+@dataclass
+class Fix:
+    file: str
+    rule_id: str
+    title: str
+    before: str
+    after: str
+    start: int
+    end: int
+    note: str = ""
+
+@dataclass
+class FixResult:
+    file: str
+    applied: int
+    diff: str
+
+class AutoFixer:
+    """
+    AutoFixer scans files and produces Fix objects that can be applied.
+    """
+
+    def __init__(
+        self,
+        theme_dir: Path,
+        backup: bool = True,
+        max_fixes_per_file: int = 200,
+        dry_run: bool = True,
+    ):
+        self.theme_dir = theme_dir
+        self.backup = backup
+        self.max_fixes_per_file = max_fixes_per_file
+        self.dry_run = dry_run
+
