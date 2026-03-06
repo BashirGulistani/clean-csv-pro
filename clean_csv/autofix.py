@@ -125,3 +125,58 @@ class AutoFixer:
         self.max_fixes_per_file = max_fixes_per_file
         self.dry_run = dry_run
 
+    def iter_theme_files(self) -> Iterable[Path]:
+        for p in self.theme_dir.rglob("*"):
+            if p.is_file() and p.suffix.lower() in TEXT_EXTS:
+                yield p
+
+    def plan(self) -> List[Fix]:
+        fixes: List[Fix] = []
+        for fp in self.iter_theme_files():
+            rel = str(fp.relative_to(self.theme_dir))
+            text = _read_text(fp)
+            fixes.extend(self._plan_file(rel, text))
+        return fixes
+
+    def apply(self, fixes: List[Fix]) -> List[FixResult]:
+
+        by_file: Dict[str, List[Fix]] = {}
+        for f in fixes:
+            by_file.setdefault(f.file, []).append(f)
+
+        results: List[FixResult] = []
+        for rel, file_fixes in by_file.items():
+            fp = (self.theme_dir / rel)
+            if not fp.exists():
+                continue
+            original = _read_text(fp)
+            updated = original
+
+
+            file_fixes_sorted = sorted(file_fixes, key=lambda x: x.start, reverse=True)
+            file_fixes_sorted = file_fixes_sorted[: self.max_fixes_per_file]
+
+            applied = 0
+            for fx in file_fixes_sorted:
+                if updated[fx.start:fx.end] != fx.before:
+
+                    continue
+                updated = updated[:fx.start] + fx.after + updated[fx.end:]
+                applied += 1
+
+            if applied == 0 or updated == original:
+                continue
+
+            diff = _unified_diff(rel, original, updated)
+
+            if not self.dry_run:
+                if self.backup:
+                    self._backup_file(fp)
+                _write_text(fp, updated)
+
+            results.append(FixResult(file=rel, applied=applied, diff=diff))
+
+        return results
+
+
+
