@@ -333,3 +333,22 @@ def summarize_fix_plan(fixes: List[Fix]) -> str:
         lines.append(f"  - {f}: {n}")
     return "\n".join(lines)
 
+
+
+
+
+def format_fix_results(results: List[FixResult], show_diff: bool = True, max_diff_chars: int = 120_000) -> str:
+    if not results:
+        return "[fix] Nothing applied."
+
+    lines = []
+    total = sum(r.applied for r in results)
+    lines.append(f"[fix] applied: {total} fixes across {len(results)} files")
+    for r in results:
+        lines.append(f"- {r.file}: {r.applied} fixes")
+        if show_diff:
+            diff = r.diff
+            if len(diff) > max_diff_chars:
+                diff = diff[:max_diff_chars] + "\n... (diff truncated)\n"
+            lines.append(diff)
+    return "\n".join(lines)
