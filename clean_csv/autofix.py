@@ -323,3 +323,13 @@ def summarize_fix_plan(fixes: List[Fix]) -> str:
         by_file[fx.file] = by_file.get(fx.file, 0) + 1
 
 
+    lines = []
+    lines.append(f"[fix] planned fixes: {len(fixes)}")
+    lines.append("[fix] by rule:")
+    for k in sorted(by_rule.keys()):
+        lines.append(f"  - {k}: {by_rule[k]}")
+    lines.append("[fix] top files:")
+    for f, n in sorted(by_file.items(), key=lambda x: x[1], reverse=True)[:10]:
+        lines.append(f"  - {f}: {n}")
+    return "\n".join(lines)
+
