@@ -175,5 +175,54 @@ class AutoFixer:
                 continue
 
 
+            diff = _unified_diff(rel, original, updated)
+
+            if not self.dry_run:
+                if self.backup:
+                    self._backup_file(fp)
+                _write_text(fp, updated)
+
+            results.append(FixResult(file=rel, applied=applied, diff=diff))
+
+        return results
+
+
+    def _plan_file(self, rel: str, text: str) -> List[Fix]:
+        fixes: List[Fix] = []
+        fixes.extend(self._plan_defer_scripts(rel, text))
+        fixes.extend(self._plan_missing_alt(rel, text))
+        fixes.extend(self._plan_lazy_loading(rel, text))
+        return fixes
+
+    def _plan_defer_scripts(self, rel: str, text: str) -> List[Fix]:
+        out: List[Fix] = []
+        for m in SCRIPT_TAG_RE.finditer(text):
+            tag = m.group(0)
+            attrs = _attrs(tag)
+            if "src" not in attrs:
+                continue
+            tl = tag.lower()
+            if "defer" in tl or "async" in tl:
+                continue
+
+            if LIQUID_COMPLEX_RE.search(tag):
+                continue
+
+            new_tag = _insert_attr(tag, "defer")
+
+            out.append(
+                Fix(
+                    file=rel,
+                    rule_id="PERF002",
+                    title="Add defer to render-blocking script",
+                    before=tag,
+                    after=new_tag,
+                    start=m.start(),
+                    end=m.end(),
+                    note="Added defer (safe for most scripts; if order matters with inline scripts, review).",
+                )
+            )
+        return out
+
 
 
