@@ -312,4 +312,14 @@ def _unified_diff(rel: str, before: str, after: str) -> str:
 
 
 
+def summarize_fix_plan(fixes: List[Fix]) -> str:
+    if not fixes:
+        return "[fix] No safe auto-fixes found."
+
+    by_rule: Dict[str, int] = {}
+    by_file: Dict[str, int] = {}
+    for fx in fixes:
+        by_rule[fx.rule_id] = by_rule.get(fx.rule_id, 0) + 1
+        by_file[fx.file] = by_file.get(fx.file, 0) + 1
+
 
