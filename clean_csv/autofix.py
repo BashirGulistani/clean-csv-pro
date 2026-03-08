@@ -304,3 +304,12 @@ class AutoFixer:
 
 
 
+def _unified_diff(rel: str, before: str, after: str) -> str:
+    a = before.splitlines(keepends=True)
+    b = after.splitlines(keepends=True)
+    d = difflib.unified_diff(a, b, fromfile=f"{rel} (before)", tofile=f"{rel} (after)")
+    return "".join(d)
+
+
+
+
