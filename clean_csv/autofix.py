@@ -130,5 +130,18 @@ class AutoFixer:
 
 
 
+    def iter_theme_files(self) -> Iterable[Path]:
+        for p in self.theme_dir.rglob("*"):
+            if p.is_file() and p.suffix.lower() in TEXT_EXTS:
+                yield p
+
+    def plan(self) -> List[Fix]:
+        fixes: List[Fix] = []
+        for fp in self.iter_theme_files():
+            rel = str(fp.relative_to(self.theme_dir))
+            text = _read_text(fp)
+            fixes.extend(self._plan_file(rel, text))
+        return fixes
+
 
 
