@@ -145,3 +145,35 @@ class AutoFixer:
 
 
 
+
+
+    def apply(self, fixes: List[Fix]) -> List[FixResult]:
+
+        by_file: Dict[str, List[Fix]] = {}
+        for f in fixes:
+            by_file.setdefault(f.file, []).append(f)
+
+        results: List[FixResult] = []
+        for rel, file_fixes in by_file.items():
+            fp = (self.theme_dir / rel)
+            if not fp.exists():
+                continue
+            original = _read_text(fp)
+            updated = original
+
+            file_fixes_sorted = sorted(file_fixes, key=lambda x: x.start, reverse=True)
+            file_fixes_sorted = file_fixes_sorted[: self.max_fixes_per_file]
+
+            applied = 0
+            for fx in file_fixes_sorted:
+                if updated[fx.start:fx.end] != fx.before:
+                    continue
+                updated = updated[:fx.start] + fx.after + updated[fx.end:]
+                applied += 1
+
+            if applied == 0 or updated == original:
+                continue
+
+
+
+
