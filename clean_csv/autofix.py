@@ -72,3 +72,27 @@ def _set_attr(tag: str, key: str, value: str) -> str:
 
 
 
+def _is_decorative_img(attrs: Dict[str, str]) -> bool:
+
+    cls = (attrs.get("class", "") or "").lower()
+    src = (attrs.get("src", "") or attrs.get("data-src", "") or "").lower()
+    if attrs.get("aria-hidden", "").lower() == "true":
+        return True
+    if attrs.get("role", "").lower() in ("presentation", "none"):
+        return True
+    if any(x in cls for x in ("icon", "sprite", "payment", "badge", "svg", "social")):
+        return True
+    if src.endswith(".svg"):
+        return True
+    if "/icons/" in src or "icon" in src or "sprite" in src:
+        return True
+    return False
+
+def _likely_below_fold(tag_start_index: int) -> bool:
+
+    return tag_start_index > 2000
+
+
+
+
+
