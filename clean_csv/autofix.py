@@ -226,3 +226,34 @@ class AutoFixer:
 
 
 
+
+    def _plan_missing_alt(self, rel: str, text: str) -> List[Fix]:
+        out: List[Fix] = []
+        for m in IMG_TAG_RE.finditer(text):
+            tag = m.group(0)
+            attrs = _attrs(tag)
+
+            if "alt" in attrs:
+                continue
+
+            if LIQUID_COMPLEX_RE.search(tag):
+                continue
+
+            if not _is_decorative_img(attrs):
+                continue
+
+            new_tag = _insert_attr(tag, 'alt=""')
+            out.append(
+                Fix(
+                    file=rel,
+                    rule_id="A11Y001",
+                    title='Add alt="" to decorative image',
+                    before=tag,
+                    after=new_tag,
+                    start=m.start(),
+                    end=m.end(),
+                    note='Added alt="" to decorative image. For meaningful images, write descriptive alt.',
+                )
+            )
+        return out
+
