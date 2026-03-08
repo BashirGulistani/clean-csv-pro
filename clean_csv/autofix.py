@@ -257,3 +257,50 @@ class AutoFixer:
             )
         return out
 
+
+
+
+
+
+    def _plan_lazy_loading(self, rel: str, text: str) -> List[Fix]:
+        out: List[Fix] = []
+        for m in IMG_TAG_RE.finditer(text):
+            tag = m.group(0)
+            attrs = _attrs(tag)
+
+            src = attrs.get("src") or attrs.get("data-src") or ""
+            if not src:
+                continue
+
+            if "loading" in attrs:
+                continue
+
+            if not _likely_below_fold(m.start()):
+                continue
+
+            if LIQUID_COMPLEX_RE.search(tag):
+                continue
+
+            new_tag = _insert_attr(tag, 'loading="lazy"')
+            out.append(
+                Fix(
+                    file=rel,
+                    rule_id="PERF001",
+                    title='Add loading="lazy" to likely below-the-fold image',
+                    before=tag,
+                    after=new_tag,
+                    start=m.start(),
+                    end=m.end(),
+                    note='Added loading="lazy" (heuristic: appears later in document). Review if above-the-fold.',
+                )
+            )
+        return out
+
+    def _backup_file(self, fp: Path) -> None:
+        ts = time.strftime("%Y%m%d-%H%M%S")
+        bak = fp.with_suffix(fp.suffix + f".bak.{ts}")
+        bak.write_bytes(fp.read_bytes())
+
+
+
+
