@@ -27,6 +27,15 @@ def _escape(s: str) -> str:
 
 
 
+def _normalize_path(path: str) -> str:
+    ws = os.getenv("GITHUB_WORKSPACE", "")
+    if ws and path.startswith(ws):
+        p = path[len(ws):]
+        if p.startswith("/") or p.startswith("\\"):
+            p = p[1:]
+        return p
+    return path
+
 
 
 
