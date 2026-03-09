@@ -91,3 +91,14 @@ def print_github_annotations(findings: List[Finding], max_annotations: int = 200
 
 
 
+
+def findings_to_check_run_json(findings: List[Finding], title: str = "ThemeAudit", max_items: int = 500) -> str:
+
+    items = []
+    for f in findings:
+        if len(items) >= max_items:
+            break
+
+
+
+
