@@ -72,3 +72,22 @@ def findings_to_annotations(findings: Iterable[Finding]) -> List[Annotation]:
 
 
 
+def print_github_annotations(findings: List[Finding], max_annotations: int = 200) -> str:
+
+    anns = findings_to_annotations(findings)[:max_annotations]
+    for a in anns:
+        msg = f"{a.title}: {a.message}".strip()
+        cmd = (
+            f"::{a.level} "
+            f"file={_escape(a.file)},line={a.line},col={a.col}::{_escape(msg)}"
+        )
+        print(cmd)
+
+    skipped = max(0, len(findings_to_annotations(findings)) - len(anns))
+    return f"[github] emitted {len(anns)} annotations" + (f" (skipped {skipped})" if skipped else "")
+
+
+
+
+
+
