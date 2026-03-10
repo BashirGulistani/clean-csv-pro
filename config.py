@@ -62,6 +62,46 @@ class ThemeAuditConfig:
             fail_on_severity=_coerce_severity(data.get("fail_on_severity", "medium")),
         )
 
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "min_severity": self.min_severity,
+            "max_files": self.max_files,
+            "max_bytes": self.max_bytes,
+            "exclude_paths": list(self.exclude_paths),
+            "include_exts": list(self.include_exts),
+            "rule_overrides": {
+                rule_id: {
+                    "enabled": override.enabled,
+                    "severity": override.severity,
+                }
+                for rule_id, override in self.rule_overrides.items()
+            },
+            "report_title": self.report_title,
+            "fail_on_severity": self.fail_on_severity,
+        }
+
+
+def _coerce_int(value: Any, default: int, minimum: int = 0) -> int:
+    try:
+        n = int(value)
+    except Exception:
+        return default
+    return max(minimum, n)
+
+
+def _coerce_str_list(value: Any) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    out: List[str] = []
+    for item in value:
+        if item is None:
+            continue
+        s = str(item).strip()
+        if s:
+            out.append(s)
+    return out
+
+
 
     
 
