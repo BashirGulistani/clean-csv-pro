@@ -122,7 +122,38 @@ def _normalize_exts(exts: List[str]) -> List[str]:
 
 
 
-    
+    def find_config_file(start_dir: Path) -> Optional[Path]:
+    start_dir = start_dir.resolve()
+
+    for candidate in DEFAULT_CONFIG_FILENAMES:
+        p = start_dir / candidate
+        if p.exists() and p.is_file():
+            return p
+
+    for parent in [start_dir, *start_dir.parents]:
+        for candidate in DEFAULT_CONFIG_FILENAMES:
+            p = parent / candidate
+            if p.exists() and p.is_file():
+                return p
+
+    return None
+
+
+def load_config(start_dir: Path, explicit_path: Optional[str] = None) -> ThemeAuditConfig:
+    if explicit_path:
+        p = Path(explicit_path).expanduser().resolve()
+        if not p.exists():
+            raise FileNotFoundError(f"Config file not found: {p}")
+        return _read_config_file(p)
+
+    found = find_config_file(start_dir)
+    if found is None:
+        return ThemeAuditConfig()
+
+    return _read_config_file(found)
+
+
+
 
 
 
