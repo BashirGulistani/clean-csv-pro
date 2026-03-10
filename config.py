@@ -157,6 +157,80 @@ def load_config(start_dir: Path, explicit_path: Optional[str] = None) -> ThemeAu
 
 
 
+def _read_config_file(path: Path) -> ThemeAuditConfig:
+    raw = path.read_text(encoding="utf-8", errors="replace")
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid JSON in config file {path}: {e}") from e
+
+    if not isinstance(data, dict):
+        raise ValueError(f"Config file must contain a JSON object: {path}")
+
+    return ThemeAuditConfig.from_dict(data)
+
+
+def should_exclude_path(relpath: str, config: ThemeAuditConfig) -> bool:
+    rel = relpath.replace("\\", "/").strip()
+
+    for prefix in config.exclude_paths:
+        p = prefix.replace("\\", "/").strip().rstrip("/")
+        if not p:
+            continue
+        if rel == p or rel.startswith(p + "/"):
+            return True
+
+    return False
+
+
+def should_include_ext(ext: str, config: ThemeAuditConfig) -> bool:
+    if not config.include_exts:
+        return True
+    return ext.lower() in set(config.include_exts)
+
+
+def apply_rule_overrides(findings: List[Any], config: ThemeAuditConfig) -> List[Any]:
+    """
+    Applies enable/disable and severity override logic to finding-like objects.
+    Assumes each finding has at least `.rule_id` and `.severity`.
+    Returns a new list.
+    """
+    out: List[Any] = []
+
+    for f in findings:
+        override = config.rule_overrides.get(getattr(f, "rule_id", ""), None)
+        if override is None:
+            out.append(f)
+            continue
+
+        if override.enabled is False:
+            continue
+
+        if override.severity:
+            try:
+                new_f = type(f)(
+                    rule_id=f.rule_id,
+                    severity=override.severity,
+                    title=f.title,
+                    message=f.message,
+                    file=f.file,
+                    line=f.line,
+                    col=f.col,
+                    help=f.help,
+                )
+                out.append(new_f)
+            except Exception:
+                out.append(f)
+            continue
+
+        out.append(f)
+
+    return out
+
+
+
+
+
 
 
 
