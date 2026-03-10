@@ -228,7 +228,42 @@ def apply_rule_overrides(findings: List[Any], config: ThemeAuditConfig) -> List[
     return out
 
 
-
+def make_default_config_json() -> str:
+    example = ThemeAuditConfig(
+        min_severity="low",
+        max_files=5000,
+        max_bytes=15_000_000,
+        exclude_paths=[
+            "node_modules",
+            ".git",
+            "dist",
+            "build",
+            "templates/customers",
+        ],
+        include_exts=[
+            ".liquid",
+            ".html",
+            ".htm",
+            ".css",
+            ".js",
+            ".json",
+            ".png",
+            ".jpg",
+            ".jpeg",
+            ".webp",
+            ".gif",
+            ".svg",
+            ".avif",
+        ],
+        rule_overrides={
+            "PERF001": RuleOverride(enabled=True, severity="low"),
+            "PERF002": RuleOverride(enabled=True, severity="high"),
+            "A11Y001": RuleOverride(enabled=True, severity="high"),
+        },
+        report_title="ThemeAudit Report",
+        fail_on_severity="medium",
+    )
+    return json.dumps(example.to_dict(), indent=2)
 
 
 
