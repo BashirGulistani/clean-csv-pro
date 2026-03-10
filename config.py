@@ -16,3 +16,13 @@ DEFAULT_CONFIG_FILENAMES = [
 
 
 
+
+@dataclass
+class RuleOverride:
+    enabled: Optional[bool] = None
+    severity: Optional[str] = None
+
+
+
+
+
