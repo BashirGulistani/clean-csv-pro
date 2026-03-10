@@ -102,6 +102,25 @@ def _coerce_str_list(value: Any) -> List[str]:
     return out
 
 
+def _coerce_severity(value: Any) -> str:
+    s = str(value or "").strip().lower()
+    if s not in {"low", "medium", "high"}:
+        return "low"
+    return s
+
+
+def _normalize_exts(exts: List[str]) -> List[str]:
+    out: List[str] = []
+    for ext in exts:
+        e = ext.strip().lower()
+        if not e:
+            continue
+        if not e.startswith("."):
+            e = "." + e
+        out.append(e)
+    return out
+
+
 
     
 
