@@ -139,3 +139,28 @@ def load_baseline(path: str | Path) -> Set[str]:
 
 
 
+
+
+
+def split_by_baseline(findings: Iterable[object], baseline_fingerprints: Set[str]) -> Tuple[List[object], List[object]]:
+    """
+    Returns:
+    - new_findings: not present in baseline
+    - known_findings: present in baseline
+    """
+    new_findings: List[object] = []
+    known_findings: List[object] = []
+
+    for f in findings:
+        fp = finding_fingerprint(f)
+        if fp in baseline_fingerprints:
+            known_findings.append(f)
+        else:
+            new_findings.append(f)
+
+    return new_findings, known_findings
+
+
+
+
+
