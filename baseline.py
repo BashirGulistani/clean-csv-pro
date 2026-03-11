@@ -212,4 +212,27 @@ def summarize_baseline_comparison(findings: Iterable[object], baseline_path: str
 
 
 
-
+def make_example_baseline_json() -> str:
+    payload = {
+        "version": BASELINE_VERSION,
+        "count": 2,
+        "entries": [
+            {
+                "fingerprint": "8f8f07f2b7fa6d6d53f58f5c1e6fa96e5b8d6e1894b82ce1f4ff9cc0f6f11111",
+                "rule_id": "A11Y001",
+                "severity": "high",
+                "file": "sections/hero.liquid",
+                "line": 18,
+                "title": "Image missing alt text",
+            },
+            {
+                "fingerprint": "fbf211dcb6cc0c649da8edb9d95d63fd2e31895b1ff8f030c8be2bf8a2d52222",
+                "rule_id": "PERF002",
+                "severity": "high",
+                "file": "layout/theme.liquid",
+                "line": 9,
+                "title": "Render-blocking script",
+            },
+        ],
+    }
+    return json.dumps(payload, indent=2)
