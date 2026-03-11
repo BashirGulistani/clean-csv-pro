@@ -164,3 +164,49 @@ def split_by_baseline(findings: Iterable[object], baseline_fingerprints: Set[str
 
 
 
+
+
+
+
+def filter_new_findings(findings: Iterable[object], baseline_path: str | Path) -> List[object]:
+    baseline = load_baseline(baseline_path)
+    new_findings, _ = split_by_baseline(findings, baseline)
+    return new_findings
+
+
+def summarize_baseline_comparison(findings: Iterable[object], baseline_path: str | Path) -> str:
+    baseline = load_baseline(baseline_path)
+    new_findings, known_findings = split_by_baseline(findings, baseline)
+
+    lines: List[str] = []
+    lines.append("[baseline] comparison summary")
+    lines.append(f"- known findings: {len(known_findings)}")
+    lines.append(f"- new findings: {len(new_findings)}")
+
+    by_severity: Dict[str, int] = {}
+    for f in new_findings:
+        sev = str(getattr(f, "severity", "low"))
+        by_severity[sev] = by_severity.get(sev, 0) + 1
+
+    if new_findings:
+        lines.append("- new findings by severity:")
+        for sev in ("high", "medium", "low"):
+            if by_severity.get(sev, 0):
+                lines.append(f"  - {sev}: {by_severity[sev]}")
+
+    top = sorted(
+        [finding_to_baseline_entry(f) for f in new_findings],
+        key=lambda x: (x.file, x.line, x.rule_id)
+    )[:15]
+
+    if top:
+        lines.append("- first new findings:")
+        for item in top:
+            lines.append(
+                f"  - [{item.severity}] {item.rule_id} {item.file}:{item.line} {item.title}"
+            )
+
+    return "\n".join(lines)
+
+
+
