@@ -103,4 +103,39 @@ def save_baseline(findings: Iterable[object], path: str | Path) -> Path:
     return p
 
 
+def load_baseline(path: str | Path) -> Set[str]:
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        raise FileNotFoundError(f"Baseline file not found: {p}")
+
+    raw = p.read_text(encoding="utf-8", errors="replace")
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Invalid baseline JSON: {p}: {e}") from e
+
+    if not isinstance(data, dict):
+        raise ValueError(f"Baseline must be a JSON object: {p}")
+
+    version = data.get("version")
+    if version != BASELINE_VERSION:
+        raise ValueError(
+            f"Unsupported baseline version: {version}. Expected {BASELINE_VERSION}."
+        )
+
+    entries = data.get("entries", [])
+    if not isinstance(entries, list):
+        raise ValueError("Baseline entries must be a list")
+
+    fingerprints: Set[str] = set()
+    for item in entries:
+        if not isinstance(item, dict):
+            continue
+        fp = str(item.get("fingerprint", "")).strip()
+        if fp:
+            fingerprints.add(fp)
+
+    return fingerprints
+
+
 
