@@ -75,3 +75,32 @@ def finding_to_baseline_entry(finding: object) -> BaselineEntry:
 
 
 
+
+
+def save_baseline(findings: Iterable[object], path: str | Path) -> Path:
+    p = Path(path).expanduser().resolve()
+
+    entries = [finding_to_baseline_entry(f) for f in findings]
+    entries = sorted(entries, key=lambda x: (x.file, x.line, x.rule_id, x.fingerprint))
+
+    payload = {
+        "version": BASELINE_VERSION,
+        "count": len(entries),
+        "entries": [
+            {
+                "fingerprint": e.fingerprint,
+                "rule_id": e.rule_id,
+                "severity": e.severity,
+                "file": e.file,
+                "line": e.line,
+                "title": e.title,
+            }
+            for e in entries
+        ],
+    }
+
+    p.write_text(json.dumps(payload, indent=2), encoding="utf-8")
+    return p
+
+
+
