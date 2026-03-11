@@ -62,3 +62,16 @@ def finding_fingerprint(finding: object) -> str:
 
 
 
+def finding_to_baseline_entry(finding: object) -> BaselineEntry:
+    return BaselineEntry(
+        fingerprint=finding_fingerprint(finding),
+        rule_id=_stable_text(getattr(finding, "rule_id", "")),
+        severity=_stable_text(getattr(finding, "severity", "")),
+        file=_stable_text(getattr(finding, "file", "")),
+        line=int(getattr(finding, "line", 1) or 1),
+        title=_stable_text(getattr(finding, "title", "")),
+    )
+
+
+
+
