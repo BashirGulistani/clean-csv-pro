@@ -254,3 +254,15 @@ def findings_trend_summary(current_findings: Iterable[object], previous_findings
     )
 
 
+    if delta_score > 0:
+        lines.append("- result: theme quality improved")
+    elif delta_score < 0:
+        lines.append("- result: theme quality regressed")
+    else:
+        lines.append("- result: no significant score change")
+
+    return "\n".join(lines)
+
+
+
+
