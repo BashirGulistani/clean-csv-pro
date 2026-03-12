@@ -172,5 +172,30 @@ def calculate_health_score(high: int, medium: int, low: int, total_files: int = 
     normalized = weighted / max(1.0, min(float(total_files), 100.0) ** 0.5)
 
     # convert to score
+    score = int(round(100 - normalized * 3.2))
+
+    if high >= 10:
+        score -= 10
+    if medium >= 25:
+        score -= 5
+
+    return max(0, min(100, score))
+
+
+def classify_risk(score: int) -> str:
+    if score >= 92:
+        return "excellent"
+    if score >= 80:
+        return "good"
+    if score >= 65:
+        return "fair"
+    if score >= 45:
+        return "poor"
+    return "critical"
+
+
+def summarize_stats(stats: ThemeStats) -> str:
+    lines: List[str] = []
+    lines.append("[stats] theme health")
 
 
