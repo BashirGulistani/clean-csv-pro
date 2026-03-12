@@ -148,5 +148,29 @@ def compute_stats(findings: Iterable[object], top_rules: int = 15, top_files: in
         total_files=max(1, len(files_map)),
     )
 
+    risk = classify_risk(score)
+
+    return ThemeStats(
+        breakdown=breakdown,
+        rules=rules_sorted,
+        files=files_sorted,
+        health_score=score,
+        risk_level=risk,
+        total_findings=breakdown.total,
+    )
+
+
+def calculate_health_score(high: int, medium: int, low: int, total_files: int = 1) -> int:
+    """
+    Produces a 0-100 score.
+    Heavier penalty for high severity findings.
+    Slight normalization by file count to avoid punishing larger themes too harshly.
+    """
+    weighted = high * 10 + medium * 4 + low * 1
+
+    # normalize pressure a bit by number of touched files
+    normalized = weighted / max(1.0, min(float(total_files), 100.0) ** 0.5)
+
+    # convert to score
 
 
