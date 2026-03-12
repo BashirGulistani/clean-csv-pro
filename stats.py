@@ -27,6 +27,38 @@ class SeverityBreakdown:
 
 
 
+@dataclass
+class RuleStat:
+    rule_id: str
+    count: int = 0
+    severity: str = "low"
+    title: str = ""
+
+
+@dataclass
+class FileStat:
+    file: str
+    count: int = 0
+    high: int = 0
+    medium: int = 0
+    low: int = 0
+
+    @property
+    def weighted_score(self) -> int:
+        return self.high * 5 + self.medium * 3 + self.low * 1
+
+    def to_dict(self) -> Dict[str, int | str]:
+        return {
+            "file": self.file,
+            "count": self.count,
+            "high": self.high,
+            "medium": self.medium,
+            "low": self.low,
+            "weighted_score": self.weighted_score,
+        }
+
+
+
 
 
 
