@@ -198,4 +198,28 @@ def summarize_stats(stats: ThemeStats) -> str:
     lines: List[str] = []
     lines.append("[stats] theme health")
 
+    lines.append(f"- score: {stats.health_score}/100")
+    lines.append(f"- risk: {stats.risk_level}")
+    lines.append(f"- findings: {stats.total_findings}")
+    lines.append(
+        f"- severity breakdown: high={stats.breakdown.high}, medium={stats.breakdown.medium}, low={stats.breakdown.low}"
+    )
+
+    if stats.rules:
+        lines.append("- top rules:")
+        for r in stats.rules[:8]:
+            lines.append(
+                f"  - {r.rule_id} ({r.severity}) x{r.count} — {r.title}"
+            )
+
+    if stats.files:
+        lines.append("- hotspot files:")
+        for f in stats.files[:8]:
+            lines.append(
+                f"  - {f.file}: total={f.count}, weighted={f.weighted_score}, high={f.high}, medium={f.medium}, low={f.low}"
+            )
+
+    return "\n".join(lines)
+
+
 
