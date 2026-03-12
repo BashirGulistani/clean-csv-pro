@@ -62,3 +62,31 @@ class FileStat:
 
 
 
+@dataclass
+class ThemeStats:
+    breakdown: SeverityBreakdown = field(default_factory=SeverityBreakdown)
+    rules: List[RuleStat] = field(default_factory=list)
+    files: List[FileStat] = field(default_factory=list)
+    health_score: int = 100
+    risk_level: str = "excellent"
+    total_findings: int = 0
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "breakdown": self.breakdown.to_dict(),
+            "rules": [
+                {
+                    "rule_id": r.rule_id,
+                    "count": r.count,
+                    "severity": r.severity,
+                    "title": r.title,
+                }
+                for r in self.rules
+            ],
+            "files": [f.to_dict() for f in self.files],
+            "health_score": self.health_score,
+            "risk_level": self.risk_level,
+            "total_findings": self.total_findings,
+        }
+
+
