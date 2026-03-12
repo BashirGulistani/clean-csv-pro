@@ -222,4 +222,35 @@ def summarize_stats(stats: ThemeStats) -> str:
     return "\n".join(lines)
 
 
+def findings_trend_summary(current_findings: Iterable[object], previous_findings: Iterable[object]) -> str:
+    current = list(current_findings)
+    previous = list(previous_findings)
+
+    cur_stats = compute_stats(current)
+    prev_stats = compute_stats(previous)
+
+    delta_total = cur_stats.total_findings - prev_stats.total_findings
+    delta_high = cur_stats.breakdown.high - prev_stats.breakdown.high
+    delta_medium = cur_stats.breakdown.medium - prev_stats.breakdown.medium
+    delta_low = cur_stats.breakdown.low - prev_stats.breakdown.low
+    delta_score = cur_stats.health_score - prev_stats.health_score
+
+    lines: List[str] = []
+    lines.append("[stats] comparison")
+    lines.append(
+        f"- findings: {prev_stats.total_findings} -> {cur_stats.total_findings} ({_fmt_delta(delta_total, inverse=True)})"
+    )
+    lines.append(
+        f"- high: {prev_stats.breakdown.high} -> {cur_stats.breakdown.high} ({_fmt_delta(delta_high, inverse=True)})"
+    )
+    lines.append(
+        f"- medium: {prev_stats.breakdown.medium} -> {cur_stats.breakdown.medium} ({_fmt_delta(delta_medium, inverse=True)})"
+    )
+    lines.append(
+        f"- low: {prev_stats.breakdown.low} -> {cur_stats.breakdown.low} ({_fmt_delta(delta_low, inverse=True)})"
+    )
+    lines.append(
+        f"- score: {prev_stats.health_score} -> {cur_stats.health_score} ({_fmt_delta(delta_score, inverse=False)})"
+    )
+
 
