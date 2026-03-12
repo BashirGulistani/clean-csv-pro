@@ -90,3 +90,35 @@ class ThemeStats:
         }
 
 
+
+
+def compute_stats(findings: Iterable[object], top_rules: int = 15, top_files: int = 15) -> ThemeStats:
+    findings_list = list(findings)
+
+    breakdown = SeverityBreakdown()
+    rules_map: Dict[str, RuleStat] = {}
+    files_map: Dict[str, FileStat] = {}
+
+    for f in findings_list:
+        severity = str(getattr(f, "severity", "low")).lower()
+        rule_id = str(getattr(f, "rule_id", "UNKNOWN"))
+        title = str(getattr(f, "title", ""))
+        file = str(getattr(f, "file", "__inventory__"))
+
+        if severity == "high":
+            breakdown.high += 1
+        elif severity == "medium":
+            breakdown.medium += 1
+        else:
+            breakdown.low += 1
+
+        if rule_id not in rules_map:
+            rules_map[rule_id] = RuleStat(
+                rule_id=rule_id,
+                count=0,
+                severity=severity,
+                title=title,
+            )
+        rules_map[rule_id].count += 1
+
+        if file not in files_map:
