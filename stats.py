@@ -282,3 +282,33 @@ def group_findings_by_file(findings: Iterable[object]) -> Dict[str, List[object]
 
 
 
+def top_hotspots(findings: Iterable[object], limit: int = 10) -> List[Tuple[str, int]]:
+    files = group_findings_by_file(findings)
+    scored: List[Tuple[str, int]] = []
+    for file, items in files.items():
+        score = 0
+        for f in items:
+            sev = str(getattr(f, "severity", "low")).lower()
+            if sev == "high":
+                score += 5
+            elif sev == "medium":
+                score += 3
+            else:
+                score += 1
+        scored.append((file, score))
+    scored.sort(key=lambda x: (-x[1], x[0]))
+    return scored[:limit]
+
+
+def _fmt_delta(delta: int, inverse: bool = False) -> str:
+    """
+    inverse=True means lower is better (e.g. findings)
+    inverse=False means higher is better (e.g. score)
+    """
+    sign = "+" if delta > 0 else ""
+    text = f"{sign}{delta}"
+    if delta == 0:
+        return f"{text}, unchanged"
+
+    improved = (delta < 0) if inverse else (delta > 0)
+    return f"{text}, {'improved' if improved else 'worsened'}"
