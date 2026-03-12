@@ -122,3 +122,31 @@ def compute_stats(findings: Iterable[object], top_rules: int = 15, top_files: in
         rules_map[rule_id].count += 1
 
         if file not in files_map:
+            files_map[file] = FileStat(file=file)
+        files_map[file].count += 1
+        if severity == "high":
+            files_map[file].high += 1
+        elif severity == "medium":
+            files_map[file].medium += 1
+        else:
+            files_map[file].low += 1
+
+    rules_sorted = sorted(
+        rules_map.values(),
+        key=lambda r: (-r.count, -SEVERITY_ORDER.get(r.severity, 1), r.rule_id),
+    )[:top_rules]
+
+    files_sorted = sorted(
+        files_map.values(),
+        key=lambda x: (-x.weighted_score, -x.count, x.file),
+    )[:top_files]
+
+    score = calculate_health_score(
+        high=breakdown.high,
+        medium=breakdown.medium,
+        low=breakdown.low,
+        total_files=max(1, len(files_map)),
+    )
+
+
+
