@@ -300,15 +300,4 @@ def top_hotspots(findings: Iterable[object], limit: int = 10) -> List[Tuple[str,
     return scored[:limit]
 
 
-def _fmt_delta(delta: int, inverse: bool = False) -> str:
-    """
-    inverse=True means lower is better (e.g. findings)
-    inverse=False means higher is better (e.g. score)
-    """
-    sign = "+" if delta > 0 else ""
-    text = f"{sign}{delta}"
-    if delta == 0:
-        return f"{text}, unchanged"
 
-    improved = (delta < 0) if inverse else (delta > 0)
-    return f"{text}, {'improved' if improved else 'worsened'}"
