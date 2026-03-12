@@ -265,4 +265,20 @@ def findings_trend_summary(current_findings: Iterable[object], previous_findings
 
 
 
+def group_findings_by_rule(findings: Iterable[object]) -> Dict[str, List[object]]:
+    out: Dict[str, List[object]] = {}
+    for f in findings:
+        rule_id = str(getattr(f, "rule_id", "UNKNOWN"))
+        out.setdefault(rule_id, []).append(f)
+    return out
+
+
+def group_findings_by_file(findings: Iterable[object]) -> Dict[str, List[object]]:
+    out: Dict[str, List[object]] = {}
+    for f in findings:
+        file = str(getattr(f, "file", "__inventory__"))
+        out.setdefault(file, []).append(f)
+    return out
+
+
 
