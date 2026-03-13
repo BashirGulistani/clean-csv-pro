@@ -80,4 +80,22 @@ def render_html_report(
       --radius: 18px;
     }}
 
+    * {{ box-sizing: border-box; }}
+    html, body {{ margin: 0; padding: 0; background: linear-gradient(180deg, #0a0f1f 0%, #0f1833 100%); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }}
+    body {{ padding: 28px; }}
+
+    .wrap {{
+      max-width: 1320px;
+      margin: 0 auto;
+    }}
+
+    .hero {{
+      background: linear-gradient(135deg, rgba(111,177,255,0.15), rgba(61,220,151,0.12));
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 22px;
+    }}
+
 
