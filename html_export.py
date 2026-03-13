@@ -54,4 +54,30 @@ def render_html_report(
     """
 
 
+    rules_table = _render_rules_table(stats.rules)
+    files_table = _render_files_table(stats.files)
+    findings_table = _render_findings_table(findings_list)
+
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{html.escape(title)}</title>
+  <style>
+    :root {{
+      --bg: #0b1020;
+      --panel: #121933;
+      --panel-2: #0f1530;
+      --text: #edf2ff;
+      --muted: #a6b0d4;
+      --border: #263159;
+      --high: #ff5d73;
+      --medium: #ffb454;
+      --low: #6fb1ff;
+      --good: #3ddc97;
+      --shadow: 0 10px 30px rgba(0,0,0,0.22);
+      --radius: 18px;
+    }}
+
 
