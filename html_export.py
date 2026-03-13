@@ -33,5 +33,25 @@ def render_html_report(
     """
 
 
+    summary_cards = f"""
+      <div class="cards">
+        <div class="card">
+          <div class="card-label">Health Score</div>
+          <div class="card-value">{stats.health_score}<span class="muted">/100</span></div>
+          <div class="card-sub">{html.escape(stats.risk_level.title())}</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Total Findings</div>
+          <div class="card-value">{stats.total_findings}</div>
+          <div class="card-sub">Across all severities</div>
+        </div>
+        <div class="card">
+          <div class="card-label">Top Hotspot</div>
+          <div class="card-value">{html.escape(stats.files[0].file) if stats.files else "None"}</div>
+          <div class="card-sub">{stats.files[0].count if stats.files else 0} findings</div>
+        </div>
+      </div>
+    """
+
 
 
