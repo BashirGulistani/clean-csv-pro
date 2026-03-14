@@ -247,3 +247,35 @@ def render_html_report(
     .sev-low {{ background: rgba(111,177,255,0.16); color: #dcebff; }}
 
 
+    code {{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }}
+
+    .empty {{
+      color: var(--muted);
+      padding: 6px 0 2px;
+    }}
+
+    .footer {{
+      color: var(--muted);
+      text-align: center;
+      padding: 12px 0 4px;
+      font-size: 0.92rem;
+    }}
+
+    @media (max-width: 960px) {{
+      body {{ padding: 16px; }}
+      .cards {{ grid-template-columns: 1fr; }}
+      .title {{ font-size: 1.5rem; }}
+    }}
+  </style>
+</head>
+
+
+
+
+
