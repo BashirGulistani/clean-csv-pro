@@ -175,4 +175,39 @@ def render_html_report(
       font-weight: 600;
     }}
 
+    .section {{
+      background: rgba(18, 25, 51, 0.92);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+      overflow: hidden;
+    }}
+
+    .section h2 {{
+      margin: 0 0 14px;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }}
+
+    .table-wrap {{
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }}
+
+    table {{
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }}
+
+    th, td {{
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: top;
+    }}
+
 
