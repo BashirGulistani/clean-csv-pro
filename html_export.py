@@ -335,6 +335,75 @@ def _render_rules_table(rules: List[object]) -> str:
     )
 
 
+def _render_files_table(files: List[object]) -> str:
+    if not files:
+        return '<div class="empty">No hotspot files found.</div>'
+
+    rows = []
+    for f in files:
+        rows.append(
+            "<tr>"
+            f"<td><code>{html.escape(str(getattr(f, 'file', '')))}</code></td>"
+            f"<td>{int(getattr(f, 'count', 0))}</td>"
+            f"<td>{int(getattr(f, 'high', 0))}</td>"
+            f"<td>{int(getattr(f, 'medium', 0))}</td>"
+            f"<td>{int(getattr(f, 'low', 0))}</td>"
+            f"<td>{int(getattr(f, 'weighted_score', 0))}</td>"
+            "</tr>"
+        )
+
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>File</th><th>Total</th><th>High</th><th>Medium</th><th>Low</th><th>Weighted</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
+def _render_findings_table(findings: List[object]) -> str:
+    if not findings:
+        return '<div class="empty">No findings 🎉</div>'
+
+    sorted_findings = sorted(
+        findings,
+        key=lambda f: (
+            {"high": 0, "medium": 1, "low": 2}.get(str(getattr(f, "severity", "low")).lower(), 3),
+            str(getattr(f, "file", "")),
+            int(getattr(f, "line", 1) or 1),
+            str(getattr(f, "rule_id", "")),
+        ),
+    )
+
+    rows = []
+    for f in sorted_findings:
+        sev = str(getattr(f, "severity", "low")).lower()
+        file = str(getattr(f, "file", ""))
+        line = int(getattr(f, "line", 1) or 1)
+        col = int(getattr(f, "col", 1) or 1)
+        rule_id = str(getattr(f, "rule_id", ""))
+        title = str(getattr(f, "title", ""))
+        message = str(getattr(f, "message", ""))
+        help_text = str(getattr(f, "help", ""))
+
+        rows.append(
+            "<tr>"
+            f"<td><span class=\"sev sev-{sev}\">{html.escape(sev)}</span></td>"
+            f"<td><code>{html.escape(rule_id)}</code></td>"
+            f"<td>{html.escape(title)}</td>"
+            f"<td><code>{html.escape(file)}:{line}:{col}</code></td>"
+            f"<td>{html.escape(message)}</td>"
+            f"<td>{html.escape(help_text)}</td>"
+            "</tr>"
+        )
+
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Severity</th><th>Rule</th><th>Title</th><th>Location</th><th>Message</th><th>Help</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
 
 
 
