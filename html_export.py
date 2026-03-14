@@ -7,11 +7,6 @@ from typing import Iterable, List, Optional
 from .stats import compute_stats
 
 
-
-
-
-
-
 def render_html_report(
     findings: Iterable[object],
     theme_dir: str = "",
@@ -31,7 +26,6 @@ def render_html_report(
         <span class="badge badge-low">Low {stats.breakdown.low}</span>
       </div>
     """
-
 
     summary_cards = f"""
       <div class="cards">
@@ -53,49 +47,11 @@ def render_html_report(
       </div>
     """
 
-
     rules_table = _render_rules_table(stats.rules)
     files_table = _render_files_table(stats.files)
     findings_table = _render_findings_table(findings_list)
 
-    return f"""<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>{html.escape(title)}</title>
-  <style>
-    :root {{
-      --bg: #0b1020;
-      --panel: #121933;
-      --panel-2: #0f1530;
-      --text: #edf2ff;
-      --muted: #a6b0d4;
-      --border: #263159;
-      --high: #ff5d73;
-      --medium: #ffb454;
-      --low: #6fb1ff;
-      --good: #3ddc97;
-      --shadow: 0 10px 30px rgba(0,0,0,0.22);
-      --radius: 18px;
-    }}
 
-    * {{ box-sizing: border-box; }}
-    html, body {{ margin: 0; padding: 0; background: linear-gradient(180deg, #0a0f1f 0%, #0f1833 100%); color: var(--text); font-family: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }}
-    body {{ padding: 28px; }}
 
-    .wrap {{
-      max-width: 1320px;
-      margin: 0 auto;
-    }}
-
-    .hero {{
-      background: linear-gradient(135deg, rgba(111,177,255,0.15), rgba(61,220,151,0.12));
-      border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 28px;
-      box-shadow: var(--shadow);
-      margin-bottom: 22px;
-    }}
 
 
