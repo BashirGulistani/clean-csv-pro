@@ -405,7 +405,19 @@ def _render_findings_table(findings: List[object]) -> str:
 
 
 
-
+def write_html_report(
+    findings: Iterable[object],
+    output_path: str,
+    theme_dir: str = "",
+    title: str = "ThemeAudit Report",
+) -> None:
+    html_doc = render_html_report(
+        findings=findings,
+        theme_dir=theme_dir,
+        title=title,
+    )
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_doc)
 
 
 
