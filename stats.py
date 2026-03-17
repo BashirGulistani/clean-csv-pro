@@ -362,3 +362,24 @@ def _render_files_table(files: List[object]) -> str:
 
 
 
+
+def _render_findings_table(findings: List[object]) -> str:
+    if not findings:
+        return '<div class="empty">No findings 🎉</div>'
+
+    sorted_findings = sorted(
+        findings,
+        key=lambda f: (
+            {"high": 0, "medium": 1, "low": 2}.get(str(getattr(f, "severity", "low")).lower(), 3),
+            str(getattr(f, "file", "")),
+            int(getattr(f, "line", 1) or 1),
+            str(getattr(f, "rule_id", "")),
+        ),
+    )
+
+
+
+
+
+
+
