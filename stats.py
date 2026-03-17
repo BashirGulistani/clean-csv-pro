@@ -115,4 +115,36 @@ def render_html_report(
     }}
 
 
+    .badge {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.05);
+    }}
+
+    .badge-high {{ color: white; background: rgba(255,93,115,0.18); border-color: rgba(255,93,115,0.4); }}
+    .badge-medium {{ color: white; background: rgba(255,180,84,0.18); border-color: rgba(255,180,84,0.4); }}
+    .badge-low {{ color: white; background: rgba(111,177,255,0.18); border-color: rgba(111,177,255,0.4); }}
+
+    .cards {{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-bottom: 22px;
+    }}
+
+    .card {{
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }}
+
 
