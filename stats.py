@@ -379,7 +379,49 @@ def _render_findings_table(findings: List[object]) -> str:
 
 
 
+    rows = []
+    for f in sorted_findings:
+        sev = str(getattr(f, "severity", "low")).lower()
+        file = str(getattr(f, "file", ""))
+        line = int(getattr(f, "line", 1) or 1)
+        col = int(getattr(f, "col", 1) or 1)
+        rule_id = str(getattr(f, "rule_id", ""))
+        title = str(getattr(f, "title", ""))
+        message = str(getattr(f, "message", ""))
+        help_text = str(getattr(f, "help", ""))
 
+        rows.append(
+            "<tr>"
+            f"<td><span class=\"sev sev-{sev}\">{html.escape(sev)}</span></td>"
+            f"<td><code>{html.escape(rule_id)}</code></td>"
+            f"<td>{html.escape(title)}</td>"
+            f"<td><code>{html.escape(file)}:{line}:{col}</code></td>"
+            f"<td>{html.escape(message)}</td>"
+            f"<td>{html.escape(help_text)}</td>"
+            "</tr>"
+        )
+
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Severity</th><th>Rule</th><th>Title</th><th>Location</th><th>Message</th><th>Help</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
+def write_html_report(
+    findings: Iterable[object],
+    output_path: str,
+    theme_dir: str = "",
+    title: str = "ThemeAudit Report",
+) -> None:
+    html_doc = render_html_report(
+        findings=findings,
+        theme_dir=theme_dir,
+        title=title,
+    )
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html_doc)
 
 
 
