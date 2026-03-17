@@ -201,3 +201,54 @@ def render_html_report(
     }}
 
 
+    th, td {{
+      text-align: left;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      vertical-align: top;
+    }}
+
+    th {{
+      color: #d8e0ff;
+      font-size: 0.92rem;
+      background: rgba(255,255,255,0.04);
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }}
+
+    td {{
+      color: #edf2ff;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }}
+
+    tr:hover td {{
+      background: rgba(255,255,255,0.03);
+    }}
+
+    .sev {{
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }}
+
+    .sev-high {{ background: rgba(255,93,115,0.16); color: #ffd8de; }}
+    .sev-medium {{ background: rgba(255,180,84,0.16); color: #ffe6c0; }}
+    .sev-low {{ background: rgba(111,177,255,0.16); color: #dcebff; }}
+
+    code {{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: rgba(255,255,255,0.06);
+      padding: 2px 6px;
+      border-radius: 8px;
+      font-size: 0.9em;
+    }}
+
