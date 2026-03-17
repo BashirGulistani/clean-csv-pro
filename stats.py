@@ -308,3 +308,57 @@ def render_html_report(
 """
 
 
+def _render_rules_table(rules: List[object]) -> str:
+    if not rules:
+        return '<div class="empty">No rule statistics available.</div>'
+
+    rows = []
+    for r in rules:
+        sev = str(getattr(r, "severity", "low")).lower()
+        rows.append(
+            "<tr>"
+            f"<td><code>{html.escape(str(getattr(r, 'rule_id', '')))}</code></td>"
+            f"<td><span class=\"sev sev-{sev}\">{html.escape(sev)}</span></td>"
+            f"<td>{int(getattr(r, 'count', 0))}</td>"
+            f"<td>{html.escape(str(getattr(r, 'title', '')))}</td>"
+            "</tr>"
+        )
+
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>Rule</th><th>Severity</th><th>Count</th><th>Title</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
+def _render_files_table(files: List[object]) -> str:
+    if not files:
+        return '<div class="empty">No hotspot files found.</div>'
+
+    rows = []
+    for f in files:
+        rows.append(
+            "<tr>"
+            f"<td><code>{html.escape(str(getattr(f, 'file', '')))}</code></td>"
+            f"<td>{int(getattr(f, 'count', 0))}</td>"
+            f"<td>{int(getattr(f, 'high', 0))}</td>"
+            f"<td>{int(getattr(f, 'medium', 0))}</td>"
+            f"<td>{int(getattr(f, 'low', 0))}</td>"
+            f"<td>{int(getattr(f, 'weighted_score', 0))}</td>"
+            "</tr>"
+        )
+
+    return (
+        '<div class="table-wrap"><table>'
+        "<thead><tr><th>File</th><th>Total</th><th>High</th><th>Medium</th><th>Low</th><th>Weighted</th></tr></thead>"
+        f"<tbody>{''.join(rows)}</tbody>"
+        "</table></div>"
+    )
+
+
+
+
+
+
+
