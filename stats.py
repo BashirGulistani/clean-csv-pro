@@ -147,4 +147,29 @@ def render_html_report(
       box-shadow: var(--shadow);
     }}
 
+    .card-label {{
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 10px;
+    }}
+
+    .card-value {{
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      word-break: break-word;
+    }}
+
+    .card-sub {{
+      color: var(--muted);
+      margin-top: 6px;
+      font-size: 0.95rem;
+    }}
+
+    .muted {{
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 600;
+    }}
+
 
