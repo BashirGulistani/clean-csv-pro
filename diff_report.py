@@ -245,3 +245,37 @@ def summarize_diff_impact(diff: DiffSummary) -> str:
     return "\n".join(lines)
 
 
+def load_findings_json(path: str) -> List[DiffItem]:
+    """
+    Loads finding-like JSON from a simple list format or an object with `items`.
+    Useful for diffing saved scan outputs.
+    """
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    items_raw: List[dict]
+    if isinstance(data, list):
+        items_raw = data
+    elif isinstance(data, dict) and isinstance(data.get("items"), list):
+        items_raw = data["items"]
+    elif isinstance(data, dict) and isinstance(data.get("added"), list):
+        items_raw = data["added"]
+    else:
+        raise ValueError(f"Unsupported findings JSON format: {path}")
+
+    items: List[DiffItem] = []
+    for raw in items_raw:
+        if not isinstance(raw, dict):
+            continue
+        items.append(
+            DiffItem(
+                rule_id=_stable_text(raw.get("rule_id", "")),
+                severity=_stable_text(raw.get("severity", "")),
+                file=_stable_text(raw.get("file", "")).replace("\\", "/"),
+                line=int(raw.get("line", 1) or 1),
+                title=_stable_text(raw.get("title", "")),
+                message=" ".join(_stable_text(raw.get("message", "")).split()),
+            )
+        )
+    return items
+
