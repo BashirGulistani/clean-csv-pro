@@ -279,3 +279,7 @@ def load_findings_json(path: str) -> List[DiffItem]:
         )
     return items
 
+
+def save_diff_json(diff: DiffSummary, path: str) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(diff_to_json(diff))
