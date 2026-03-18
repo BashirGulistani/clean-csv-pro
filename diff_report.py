@@ -156,6 +156,26 @@ def render_diff_text(diff: DiffSummary, max_items: int = 20) -> str:
 
 
 
+def render_diff_markdown(diff: DiffSummary, title: str = "ThemeAudit Diff Report", max_items: int = 200) -> str:
+    lines: List[str] = []
+    lines.append(f"# {title}")
+    lines.append("")
+    lines.append(f"- Added: **{diff.added_count}**")
+    lines.append(f"- Removed: **{diff.removed_count}**")
+    lines.append(f"- Unchanged: **{diff.unchanged_count}**")
+    lines.append("")
+
+    if diff.added:
+        lines.append("## Added findings")
+        lines.append("")
+        lines.append("| Severity | Rule | Location | Title | Message |")
+        lines.append("|---|---|---|---|---|")
+        for item in diff.added[:max_items]:
+            lines.append(
+                f"| **{item.severity}** | `{item.rule_id}` | `{item.file}:{item.line}` | {item.title} | {item.message} |"
+            )
+        lines.append("")
+
 
 
 
