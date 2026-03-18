@@ -178,4 +178,42 @@ def render_diff_markdown(diff: DiffSummary, title: str = "ThemeAudit Diff Report
 
 
 
+    if diff.removed:
+        lines.append("## Removed findings")
+        lines.append("")
+        lines.append("| Severity | Rule | Location | Title | Message |")
+        lines.append("|---|---|---|---|---|")
+        for item in diff.removed[:max_items]:
+            lines.append(
+                f"| **{item.severity}** | `{item.rule_id}` | `{item.file}:{item.line}` | {item.title} | {item.message} |"
+            )
+        lines.append("")
+
+    if not diff.added and not diff.removed:
+        lines.append("No differences found.")
+        lines.append("")
+
+    return "\n".join(lines)
+
+
+def diff_to_json(diff: DiffSummary) -> str:
+    return json.dumps(diff.to_dict(), indent=2)
+
+
+def severity_delta(diff: DiffSummary) -> Dict[str, int]:
+    delta = {"high": 0, "medium": 0, "low": 0}
+
+    for item in diff.added:
+        sev = item.severity.lower()
+        if sev in delta:
+            delta[sev] += 1
+
+    for item in diff.removed:
+        sev = item.severity.lower()
+        if sev in delta:
+            delta[sev] -= 1
+
+    return delta
+
+
 
