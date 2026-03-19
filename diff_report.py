@@ -266,6 +266,26 @@ def load_findings_json(path: str) -> List[DiffItem]:
         raise ValueError(f"Unsupported findings JSON format: {path}")
 
 
+    items: List[DiffItem] = []
+    for raw in items_raw:
+        if not isinstance(raw, dict):
+            continue
+        items.append(
+            DiffItem(
+                rule_id=_stable_text(raw.get("rule_id", "")),
+                severity=_stable_text(raw.get("severity", "")),
+                file=_stable_text(raw.get("file", "")).replace("\\", "/"),
+                line=int(raw.get("line", 1) or 1),
+                title=_stable_text(raw.get("title", "")),
+                message=" ".join(_stable_text(raw.get("message", "")).split()),
+            )
+        )
+    return items
+
+
+def save_diff_json(diff: DiffSummary, path: str) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        f.write(diff_to_json(diff))
 
 
 
