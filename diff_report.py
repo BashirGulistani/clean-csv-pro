@@ -202,6 +202,55 @@ def diff_to_json(diff: DiffSummary) -> str:
 
 
 
+def severity_delta(diff: DiffSummary) -> Dict[str, int]:
+    delta = {"high": 0, "medium": 0, "low": 0}
+
+    for item in diff.added:
+        sev = item.severity.lower()
+        if sev in delta:
+            delta[sev] += 1
+
+    for item in diff.removed:
+        sev = item.severity.lower()
+        if sev in delta:
+            delta[sev] -= 1
+
+    return delta
+
+
+def summarize_diff_impact(diff: DiffSummary) -> str:
+    delta = severity_delta(diff)
+
+    lines: List[str] = []
+    lines.append("[diff] impact summary")
+    lines.append(
+        f"- high delta: {delta['high']:+d}"
+    )
+    lines.append(
+        f"- medium delta: {delta['medium']:+d}"
+    )
+    lines.append(
+        f"- low delta: {delta['low']:+d}"
+    )
+
+    weighted = delta["high"] * 5 + delta["medium"] * 3 + delta["low"] * 1
+    lines.append(f"- weighted delta: {weighted:+d}")
+
+    if weighted < 0:
+        lines.append("- result: overall improvement")
+    elif weighted > 0:
+        lines.append("- result: overall regression")
+    else:
+        lines.append("- result: no net change")
+
+    return "\n".join(lines)
+
+
+
+
+
+
+
 
 
 
