@@ -9,6 +9,12 @@ from .config import make_default_config_json
 
 
 
+DEFAULT_WORKFLOW_YAML = """name: themeaudit
+
+on:
+  pull_request:
+  push:
+    branches: [main, master]
 
 
 
