@@ -51,7 +51,21 @@ jobs:
           sarif_file: themeaudit.sarif.json
 
 
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: themeaudit-report
+          path: themeaudit-report.md
+"""
 
+
+README_SNIPPET = """## ThemeAudit
+
+This repository is configured for ThemeAudit.
+
+### Local scan
+```bash
+themeaudit scan . --out themeaudit-report.md --sarif themeaudit.sarif.json
 
 
 
