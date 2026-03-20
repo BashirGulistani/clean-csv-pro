@@ -30,5 +30,19 @@ jobs:
         uses: actions/checkout@v4
 
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install ThemeAudit
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install themeaudit
+
+      - name: Run ThemeAudit
+        run: |
+          themeaudit scan . --out themeaudit-report.md --sarif themeaudit.sarif.json || true
+
 
 
