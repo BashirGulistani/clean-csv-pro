@@ -45,4 +45,13 @@ jobs:
           themeaudit scan . --out themeaudit-report.md --sarif themeaudit.sarif.json || true
 
 
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: themeaudit.sarif.json
+
+
+
+
+
 
