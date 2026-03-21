@@ -112,3 +112,43 @@ class CachedFileEntry:
 
 
 
+@dataclass
+class ScanCache:
+    version: int = CACHE_VERSION
+    root_fingerprint: str = ""
+    files: Dict[str, CachedFileEntry] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "version": self.version,
+            "root_fingerprint": self.root_fingerprint,
+            "files": {k: v.to_dict() for k, v in self.files.items()},
+        }
+
+    @classmethod
+    def from_dict(cls, raw: Dict[str, object]) -> "ScanCache":
+        files_raw = raw.get("files", {})
+        files: Dict[str, CachedFileEntry] = {}
+
+        if isinstance(files_raw, dict):
+            for relpath, entry in files_raw.items():
+                if isinstance(entry, dict):
+                    files[str(relpath)] = CachedFileEntry.from_dict(entry)
+
+        return cls(
+            version=int(raw.get("version", CACHE_VERSION) or CACHE_VERSION),
+            root_fingerprint=str(raw.get("root_fingerprint", "")),
+            files=files,
+        )
+
+
+
+
+
+
+
+
+
+
+
+
