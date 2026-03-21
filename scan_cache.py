@@ -20,3 +20,13 @@ def _stable_text(value: object) -> str:
 
 
 
+
+
+def _sha256_bytes(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
+
+
+
+
+
+
