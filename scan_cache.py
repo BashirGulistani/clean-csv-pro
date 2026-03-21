@@ -147,6 +147,25 @@ class ScanCache:
 
 
 
+def make_root_fingerprint(theme_dir: Path, config_signature: str = "") -> str:
+    """
+    Root fingerprint should change when:
+    - cache format changes
+    - config changes
+    - Python version logic changes (approx)
+    """
+    parts = [
+        f"cache_version={CACHE_VERSION}",
+        f"theme_dir={theme_dir.resolve()}",
+        f"config_signature={config_signature}",
+    ]
+    return _sha256_bytes("\n".join(parts).encode("utf-8"))
+
+
+
+
+
+
 
 
 
