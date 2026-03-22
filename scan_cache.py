@@ -127,6 +127,87 @@ class CachedFileEntry:
 
 
 
+@dataclass
+class ScanCache:
+    version: int = CACHE_VERSION
+    root_fingerprint: str = ""
+    files: Dict[str, CachedFileEntry] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "version": self.version,
+            "root_fingerprint": self.root_fingerprint,
+            "files": {k: v.to_dict() for k, v in self.files.items()},
+        }
+
+    @classmethod
+    def from_dict(cls, raw: Dict[str, object]) -> "ScanCache":
+        files_raw = raw.get("files", {})
+        files: Dict[str, CachedFileEntry] = {}
+
+        if isinstance(files_raw, dict):
+            for relpath, entry in files_raw.items():
+                if isinstance(entry, dict):
+                    files[str(relpath)] = CachedFileEntry.from_dict(entry)
+
+        return cls(
+            version=int(raw.get("version", CACHE_VERSION) or CACHE_VERSION),
+            root_fingerprint=str(raw.get("root_fingerprint", "")),
+            files=files,
+        )
+
+
+def make_root_fingerprint(theme_dir: Path, config_signature: str = "") -> str:
+    """
+    Root fingerprint should change when:
+    - cache format changes
+    - config changes
+    - Python version logic changes (approx)
+    """
+    parts = [
+        f"cache_version={CACHE_VERSION}",
+        f"theme_dir={theme_dir.resolve()}",
+        f"config_signature={config_signature}",
+    ]
+    return _sha256_bytes("\n".join(parts).encode("utf-8"))
+
+
+def default_cache_path(theme_dir: Path) -> Path:
+    return theme_dir / ".themeaudit.cache.json"
+
+
+def load_cache(path: str | Path) -> ScanCache:
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return ScanCache()
+
+    raw = p.read_text(encoding="utf-8", errors="replace")
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return ScanCache()
+
+    if not isinstance(data, dict):
+        return ScanCache()
+
+    try:
+        cache = ScanCache.from_dict(data)
+    except Exception:
+        return ScanCache()
+
+    if cache.version != CACHE_VERSION:
+        return ScanCache()
+
+    return cache
+
+
+
+
+
+
+
+
+
 
 
 
