@@ -205,6 +205,33 @@ def load_cache(path: str | Path) -> ScanCache:
 
 
 
+def save_cache(cache: ScanCache, path: str | Path) -> Path:
+    p = Path(path).expanduser().resolve()
+    p.write_text(json.dumps(cache.to_dict(), indent=2), encoding="utf-8")
+    return p
+
+
+def get_file_state(path: Path) -> Tuple[int, int]:
+    st = path.stat()
+    return int(st.st_size), int(st.st_mtime_ns)
+
+
+def file_changed(path: Path, entry: Optional[CachedFileEntry]) -> bool:
+    if entry is None:
+        return True
+
+    try:
+        size, mtime_ns = get_file_state(path)
+    except OSError:
+        return True
+
+    if size != entry.size or mtime_ns != entry.mtime_ns:
+        return True
+
+    return False
+
+
+
 
 
 
