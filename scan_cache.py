@@ -247,6 +247,34 @@ def build_cache_entry(path: Path, relpath: str, findings: Iterable[object]) -> C
 
 
 
+def cached_entry_valid(path: Path, entry: Optional[CachedFileEntry]) -> bool:
+    if entry is None:
+        return False
+
+    try:
+        size, mtime_ns = get_file_state(path)
+    except OSError:
+        return False
+
+    if size != entry.size or mtime_ns != entry.mtime_ns:
+        return False
+
+    try:
+        digest = _file_digest(path)
+    except OSError:
+        return False
+
+    return digest == entry.digest
+
+
+def extract_cached_findings(entry: CachedFileEntry) -> List[CachedFinding]:
+    return list(entry.findings)
+
+
+
+
+
+
 
 
 
