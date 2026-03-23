@@ -197,6 +197,53 @@ def get_file_state(path: Path) -> Tuple[int, int]:
     return int(st.st_size), int(st.st_mtime_ns)
 
 
+def file_changed(path: Path, entry: Optional[CachedFileEntry]) -> bool:
+    if entry is None:
+        return True
+
+    try:
+        size, mtime_ns = get_file_state(path)
+    except OSError:
+        return True
+
+    if size != entry.size or mtime_ns != entry.mtime_ns:
+        return True
+
+    return False
+
+
+def build_cache_entry(path: Path, relpath: str, findings: Iterable[object]) -> CachedFileEntry:
+    size, mtime_ns = get_file_state(path)
+    digest = _file_digest(path)
+
+    cached_findings: List[CachedFinding] = []
+    for f in findings:
+        cached_findings.append(
+            CachedFinding(
+                rule_id=str(getattr(f, "rule_id", "")),
+                severity=str(getattr(f, "severity", "low")),
+                title=str(getattr(f, "title", "")),
+                message=str(getattr(f, "message", "")),
+                file=str(getattr(f, "file", relpath)),
+                line=int(getattr(f, "line", 1) or 1),
+                col=int(getattr(f, "col", 1) or 1),
+                help=str(getattr(f, "help", "")),
+            )
+        )
+
+    return CachedFileEntry(
+        relpath=relpath,
+        size=size,
+        mtime_ns=mtime_ns,
+        digest=digest,
+        findings=cached_findings,
+    )
+
+
+
+
+
+
 
 
 
