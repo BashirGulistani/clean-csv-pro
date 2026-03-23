@@ -90,6 +90,72 @@ class CachedFileEntry:
         }
 
 
+    @classmethod
+    def from_dict(cls, raw: Dict[str, object]) -> "CachedFileEntry":
+        findings_raw = raw.get("findings", [])
+        findings: List[CachedFinding] = []
+        if isinstance(findings_raw, list):
+            for item in findings_raw:
+                if isinstance(item, dict):
+                    findings.append(CachedFinding.from_dict(item))
+
+        return cls(
+            relpath=str(raw.get("relpath", "")),
+            size=int(raw.get("size", 0) or 0),
+            mtime_ns=int(raw.get("mtime_ns", 0) or 0),
+            digest=str(raw.get("digest", "")),
+            findings=findings,
+        )
+
+
+@dataclass
+class ScanCache:
+    version: int = CACHE_VERSION
+    root_fingerprint: str = ""
+    files: Dict[str, CachedFileEntry] = field(default_factory=dict)
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "version": self.version,
+            "root_fingerprint": self.root_fingerprint,
+            "files": {k: v.to_dict() for k, v in self.files.items()},
+        }
+
+    @classmethod
+    def from_dict(cls, raw: Dict[str, object]) -> "ScanCache":
+        files_raw = raw.get("files", {})
+        files: Dict[str, CachedFileEntry] = {}
+
+        if isinstance(files_raw, dict):
+            for relpath, entry in files_raw.items():
+                if isinstance(entry, dict):
+                    files[str(relpath)] = CachedFileEntry.from_dict(entry)
+
+        return cls(
+            version=int(raw.get("version", CACHE_VERSION) or CACHE_VERSION),
+            root_fingerprint=str(raw.get("root_fingerprint", "")),
+            files=files,
+        )
+
+
+def make_root_fingerprint(theme_dir: Path, config_signature: str = "") -> str:
+    """
+    Root fingerprint should change when:
+    - cache format changes
+    - config changes
+    - Python version logic changes (approx)
+    """
+    parts = [
+        f"cache_version={CACHE_VERSION}",
+        f"theme_dir={theme_dir.resolve()}",
+        f"config_signature={config_signature}",
+    ]
+    return _sha256_bytes("\n".join(parts).encode("utf-8"))
+
+
+
+
+
 
 
 
