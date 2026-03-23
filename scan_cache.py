@@ -157,6 +157,52 @@ def make_root_fingerprint(theme_dir: Path, config_signature: str = "") -> str:
 
 
 
+def default_cache_path(theme_dir: Path) -> Path:
+    return theme_dir / ".themeaudit.cache.json"
+
+
+def load_cache(path: str | Path) -> ScanCache:
+    p = Path(path).expanduser().resolve()
+    if not p.exists():
+        return ScanCache()
+
+    raw = p.read_text(encoding="utf-8", errors="replace")
+    try:
+        data = json.loads(raw)
+    except json.JSONDecodeError:
+        return ScanCache()
+
+    if not isinstance(data, dict):
+        return ScanCache()
+
+    try:
+        cache = ScanCache.from_dict(data)
+    except Exception:
+        return ScanCache()
+
+    if cache.version != CACHE_VERSION:
+        return ScanCache()
+
+    return cache
+
+
+def save_cache(cache: ScanCache, path: str | Path) -> Path:
+    p = Path(path).expanduser().resolve()
+    p.write_text(json.dumps(cache.to_dict(), indent=2), encoding="utf-8")
+    return p
+
+
+def get_file_state(path: Path) -> Tuple[int, int]:
+    st = path.stat()
+    return int(st.st_size), int(st.st_mtime_ns)
+
+
+
+
+
+
+
+
 
 
 
