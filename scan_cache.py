@@ -264,3 +264,7 @@ def build_cache_entry(path: Path, relpath: str, findings: Iterable[object]) -> C
 
 
 
+
+
+
+
