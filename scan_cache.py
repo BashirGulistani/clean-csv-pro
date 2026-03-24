@@ -271,6 +271,37 @@ def extract_cached_findings(entry: CachedFileEntry) -> List[CachedFinding]:
     return list(entry.findings)
 
 
+def invalidate_missing_files(cache: ScanCache, existing_relpaths: Iterable[str]) -> None:
+    existing = set(existing_relpaths)
+    stale = [rel for rel in cache.files.keys() if rel not in existing]
+    for rel in stale:
+        del cache.files[rel]
+
+
+def summarize_cache_usage(
+    total_files: int,
+    cache_hits: int,
+    rescanned: int,
+    reused_findings: int,
+) -> str:
+    miss = max(0, total_files - cache_hits)
+    lines: List[str] = []
+    lines.append("[cache] scan cache summary")
+    lines.append(f"- files considered: {total_files}")
+    lines.append(f"- cache hits: {cache_hits}")
+    lines.append(f"- rescanned files: {rescanned}")
+    lines.append(f"- reused findings: {reused_findings}")
+    lines.append(f"- cache misses: {miss}")
+    if total_files > 0:
+        hit_rate = (cache_hits / total_files) * 100.0
+        lines.append(f"- hit rate: {hit_rate:.1f}%")
+    return "\n".join(lines)
+
+
+
+
+
+
 
 
 
