@@ -77,6 +77,45 @@ class CachedFinding:
 
 
 
+@dataclass
+class CachedFileEntry:
+    relpath: str
+    size: int
+    mtime_ns: int
+    digest: str
+    findings: List[CachedFinding] = field(default_factory=list)
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "relpath": self.relpath,
+            "size": self.size,
+            "mtime_ns": self.mtime_ns,
+            "digest": self.digest,
+            "findings": [f.to_dict() for f in self.findings],
+        }
+
+    @classmethod
+    def from_dict(cls, raw: Dict[str, object]) -> "CachedFileEntry":
+        findings_raw = raw.get("findings", [])
+        findings: List[CachedFinding] = []
+        if isinstance(findings_raw, list):
+            for item in findings_raw:
+                if isinstance(item, dict):
+                    findings.append(CachedFinding.from_dict(item))
+
+        return cls(
+            relpath=str(raw.get("relpath", "")),
+            size=int(raw.get("size", 0) or 0),
+            mtime_ns=int(raw.get("mtime_ns", 0) or 0),
+            digest=str(raw.get("digest", "")),
+            findings=findings,
+        )
+
+
+
+
+
+
 
 
 
