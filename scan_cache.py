@@ -298,6 +298,34 @@ def summarize_cache_usage(
     return "\n".join(lines)
 
 
+def merge_cached_and_fresh_findings(
+    cached_entries: Iterable[CachedFileEntry],
+    fresh_findings_by_file: Dict[str, List[object]],
+) -> List[object]:
+    """
+    Utility for callers that want one combined finding list.
+    Cached findings are returned as CachedFinding objects.
+    Fresh findings are returned unchanged.
+    """
+    out: List[object] = []
+
+    for entry in cached_entries:
+        out.extend(entry.findings)
+
+    for _, items in fresh_findings_by_file.items():
+        out.extend(items)
+
+    return out
+
+
+def config_signature_from_dict(config: Dict[str, object]) -> str:
+    normalized = json.dumps(config, sort_keys=True, separators=(",", ":"))
+    return _sha256_bytes(normalized.encode("utf-8"))
+
+
+
+
+
 
 
 
