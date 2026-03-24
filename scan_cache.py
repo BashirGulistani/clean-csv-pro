@@ -324,7 +324,17 @@ def config_signature_from_dict(config: Dict[str, object]) -> str:
 
 
 
+def should_rebuild_entire_cache(cache: ScanCache, theme_dir: Path, config_signature: str = "") -> bool:
+    expected = make_root_fingerprint(theme_dir, config_signature=config_signature)
+    return cache.root_fingerprint != expected
 
+
+def initialize_cache(theme_dir: Path, config_signature: str = "") -> ScanCache:
+    return ScanCache(
+        version=CACHE_VERSION,
+        root_fingerprint=make_root_fingerprint(theme_dir, config_signature=config_signature),
+        files={},
+    )
 
 
 
