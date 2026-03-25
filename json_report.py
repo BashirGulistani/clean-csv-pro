@@ -253,7 +253,33 @@ def render_compact_json_summary(report: Dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
+def merge_json_reports(reports: Iterable[Dict[str, Any]]) -> Dict[str, Any]:
+    reports_list = list(reports)
+    merged_findings: List[Dict[str, Any]] = []
+    merged_meta: List[Dict[str, Any]] = []
 
+    for report in reports_list:
+        merged_findings.extend(extract_findings_from_report(report))
+        merged_meta.append(
+            {
+                "theme_dir": _safe_str(report.get("theme_dir", "")),
+                "generated_at": _safe_str(report.get("generated_at", "")),
+                "finding_count": _safe_int(report.get("finding_count", 0)),
+            }
+        )
+
+    return build_json_report(
+        findings=merged_findings,
+        theme_dir="multiple",
+        metadata={"sources": merged_meta},
+    )
+
+
+def write_ndjson_findings(findings: Iterable[object], output_path: str | Path) -> Path:
+    p = Path(output_path).expanduser().resolve()
+    lines = [json.dumps(finding_to_dict(f), sort_keys=True) for f in findings]
+    p.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+    return p
 
 
 
