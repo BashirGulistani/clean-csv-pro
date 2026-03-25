@@ -72,6 +72,46 @@ def finding_to_dict(finding: object) -> Dict[str, Any]:
     }
 
 
+def findings_to_list(findings: Iterable[object]) -> List[Dict[str, Any]]:
+    return [finding_to_dict(f) for f in findings]
+
+
+def summarize_findings(findings: Iterable[object]) -> Dict[str, Any]:
+    items = findings_to_list(findings)
+
+    counts = {"high": 0, "medium": 0, "low": 0}
+    by_rule: Dict[str, int] = {}
+    by_file: Dict[str, int] = {}
+
+    for item in items:
+        sev = str(item.get("severity", "low")).lower()
+        counts[sev] = counts.get(sev, 0) + 1
+
+        rule_id = str(item.get("rule_id", "UNKNOWN"))
+        by_rule[rule_id] = by_rule.get(rule_id, 0) + 1
+
+        file = str(item.get("file", "__inventory__"))
+        by_file[file] = by_file.get(file, 0) + 1
+
+    top_rules = sorted(by_rule.items(), key=lambda x: (-x[1], x[0]))[:15]
+    top_files = sorted(by_file.items(), key=lambda x: (-x[1], x[0]))[:15]
+
+    return {
+        "counts": {
+            "high": counts.get("high", 0),
+            "medium": counts.get("medium", 0),
+            "low": counts.get("low", 0),
+            "total": len(items),
+        },
+        "top_rules": [{"rule_id": k, "count": v} for k, v in top_rules],
+        "top_files": [{"file": k, "count": v} for k, v in top_files],
+    }
+
+
+
+
+
+
 
 
 
