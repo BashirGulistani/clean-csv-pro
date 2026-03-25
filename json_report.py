@@ -197,6 +197,41 @@ def write_json_report(
 
 
 
+def load_json_report(path: str | Path) -> Dict[str, Any]:
+    p = Path(path).expanduser().resolve()
+    raw = p.read_text(encoding="utf-8", errors="replace")
+    data = json.loads(raw)
+
+    if not isinstance(data, dict):
+        raise ValueError(f"Invalid report format in {p}: root must be an object")
+
+    return data
+
+
+def extract_findings_from_report(report: Dict[str, Any]) -> List[Dict[str, Any]]:
+    findings = report.get("findings", [])
+    if not isinstance(findings, list):
+        raise ValueError("Report has invalid findings field; expected a list")
+    out: List[Dict[str, Any]] = []
+    for item in findings:
+        if isinstance(item, dict):
+            out.append(finding_to_dict(item))
+    return out
+
+
+def render_compact_json_summary(report: Dict[str, Any]) -> str:
+    tool = report.get("tool", {}) if isinstance(report.get("tool"), dict) else {}
+    name = _safe_str(tool.get("name", "ThemeAudit"))
+    version = _safe_str(tool.get("version", ""))
+    theme_dir = _safe_str(report.get("theme_dir", ""))
+    count = _safe_int(report.get("finding_count", 0), 0)
+
+    lines: List[str] = []
+    lines.append("[json] report summary")
+    lines.append(f"- tool: {name} {version}".strip())
+    lines.append(f"- theme: {theme_dir or '.'}")
+    lines.append(f"- findings: {count}")
+
 
 
 
