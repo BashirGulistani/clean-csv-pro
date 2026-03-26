@@ -172,6 +172,36 @@ def render_json_report(
 
 
 
+def write_json_report(
+    findings: Iterable[object],
+    output_path: str | Path,
+    theme_dir: str = "",
+    tool_version: str = "0.1.0",
+    include_stats: bool = True,
+    include_summary: bool = True,
+    metadata: Optional[Dict[str, Any]] = None,
+    indent: int = 2,
+) -> Path:
+    p = Path(output_path).expanduser().resolve()
+    p.write_text(
+        render_json_report(
+            findings=findings,
+            theme_dir=theme_dir,
+            tool_version=tool_version,
+            include_stats=include_stats,
+            include_summary=include_summary,
+            metadata=metadata,
+            indent=indent,
+        ),
+        encoding="utf-8",
+    )
+    return p
+
+
+
+
+
+
 
 
 
