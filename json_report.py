@@ -107,6 +107,46 @@ def summarize_findings(findings: Iterable[object]) -> Dict[str, Any]:
 
 
 
+def build_json_report(
+    findings: Iterable[object],
+    theme_dir: str = "",
+    tool_version: str = "0.1.0",
+    include_stats: bool = True,
+    include_summary: bool = True,
+    metadata: Optional[Dict[str, Any]] = None,
+) -> Dict[str, Any]:
+    findings_list = list(findings)
+    findings_json = findings_to_list(findings_list)
+
+    report: Dict[str, Any] = {
+        "tool": {
+            "name": "ThemeAudit",
+            "version": tool_version,
+        },
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "theme_dir": theme_dir,
+        "finding_count": len(findings_json),
+        "findings": findings_json,
+    }
+
+    if include_summary:
+        report["summary"] = summarize_findings(findings_json)
+
+    if include_stats:
+        stats = compute_stats(findings_list)
+        report["stats"] = stats.to_dict()
+
+    if metadata:
+        report["metadata"] = dict(metadata)
+
+    return report
+
+
+
+
+
+
+
 
 
 
