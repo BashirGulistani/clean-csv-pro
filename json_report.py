@@ -227,6 +227,36 @@ def render_compact_json_summary(report: Dict[str, Any]) -> str:
     count = _safe_int(report.get("finding_count", 0), 0)
 
 
+    lines: List[str] = []
+    lines.append("[json] report summary")
+    lines.append(f"- tool: {name} {version}".strip())
+    lines.append(f"- theme: {theme_dir or '.'}")
+    lines.append(f"- findings: {count}")
+
+    summary = report.get("summary", {})
+    if isinstance(summary, dict):
+        counts = summary.get("counts", {})
+        if isinstance(counts, dict):
+            lines.append(
+                "- severities: "
+                f"high={_safe_int(counts.get('high', 0))}, "
+                f"medium={_safe_int(counts.get('medium', 0))}, "
+                f"low={_safe_int(counts.get('low', 0))}"
+            )
+
+    stats = report.get("stats", {})
+    if isinstance(stats, dict):
+        health = _safe_int(stats.get("health_score", 0))
+        risk = _safe_str(stats.get("risk_level", ""))
+        lines.append(f"- health: {health}/100 ({risk})")
+
+    return "\n".join(lines)
+
+
+
+
+
+
 
 
 
