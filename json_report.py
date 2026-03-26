@@ -47,6 +47,36 @@ def finding_to_dict(finding: object) -> Dict[str, Any]:
     if is_dataclass(finding):
         raw = asdict(finding)
         return {
+            "rule_id": _safe_str(raw.get("rule_id", "")),
+            "severity": _safe_str(raw.get("severity", "low")),
+            "title": _safe_str(raw.get("title", "")),
+            "message": _safe_str(raw.get("message", "")),
+            "file": _safe_str(raw.get("file", "")),
+            "line": _safe_int(raw.get("line", 1), 1),
+            "col": _safe_int(raw.get("col", 1), 1),
+            "help": _safe_str(raw.get("help", "")),
+        }
+
+    return {
+        "rule_id": _safe_str(getattr(finding, "rule_id", "")),
+        "severity": _safe_str(getattr(finding, "severity", "low")),
+        "title": _safe_str(getattr(finding, "title", "")),
+        "message": _safe_str(getattr(finding, "message", "")),
+        "file": _safe_str(getattr(finding, "file", "")),
+        "line": _safe_int(getattr(finding, "line", 1), 1),
+        "col": _safe_int(getattr(finding, "col", 1), 1),
+        "help": _safe_str(getattr(finding, "help", "")),
+    }
+
+
+def findings_to_list(findings: Iterable[object]) -> List[Dict[str, Any]]:
+    return [finding_to_dict(f) for f in findings]
+
+
+
+
+
+
 
 
 
