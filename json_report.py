@@ -147,6 +147,30 @@ def build_json_report(
 
 
 
+def render_json_report(
+    findings: Iterable[object],
+    theme_dir: str = "",
+    tool_version: str = "0.1.0",
+    include_stats: bool = True,
+    include_summary: bool = True,
+    metadata: Optional[Dict[str, Any]] = None,
+    indent: int = 2,
+) -> str:
+    report = build_json_report(
+        findings=findings,
+        theme_dir=theme_dir,
+        tool_version=tool_version,
+        include_stats=include_stats,
+        include_summary=include_summary,
+        metadata=metadata,
+    )
+    return json.dumps(report, indent=indent, sort_keys=False)
+
+
+
+
+
+
 
 
 
