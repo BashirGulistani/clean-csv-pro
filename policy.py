@@ -122,6 +122,33 @@ def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyRes
 
 
 
+    fail_on_rules_set = {x.strip().upper() for x in policy.fail_on_rules if str(x).strip()}
+    if fail_on_rules_set:
+        matched_rules = sorted({
+            str(getattr(f, "rule_id", "")).upper()
+            for f in items
+            if str(getattr(f, "rule_id", "")).upper() in fail_on_rules_set
+        })
+        if matched_rules:
+            triggered_rules.extend(matched_rules)
+            reasons.append(
+                f"Blocked rule(s) present: {', '.join(matched_rules)}."
+            )
+
+    if policy.max_hotspot_findings is not None:
+        worst_file, worst_count = worst_hotspot(items)
+        if worst_count > policy.max_hotspot_findings:
+            reasons.append(
+                f"Hotspot limit exceeded: file '{worst_file}' has {worst_count} findings "
+                f"(limit {policy.max_hotspot_findings})."
+            )
+
+    passed = len(reasons) == 0
+
+
+
+
+
 
 
 
