@@ -62,6 +62,45 @@ class PolicyResult:
 
 
 
+@dataclass
+class ScanPolicy:
+    fail_on_severity: str = "medium"
+    budget: PolicyBudget = field(default_factory=PolicyBudget)
+    fail_on_rules: List[str] = field(default_factory=list)
+    warn_on_rules: List[str] = field(default_factory=list)
+    max_hotspot_findings: Optional[int] = None
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "fail_on_severity": self.fail_on_severity,
+            "budget": self.budget.to_dict(),
+            "fail_on_rules": list(self.fail_on_rules),
+            "warn_on_rules": list(self.warn_on_rules),
+            "max_hotspot_findings": self.max_hotspot_findings,
+        }
+
+
+def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyResult:
+    items = list(findings)
+    counts = count_by_severity(items)
+
+    reasons: List[str] = []
+    triggered_rules: List[str] = []
+
+    fail_rank = SEVERITY_RANK.get(policy.fail_on_severity.lower(), 2)
+    matched_fail_severity = [
+        f for f in items if SEVERITY_RANK.get(str(getattr(f, "severity", "low")).lower(), 1) >= fail_rank
+    ]
+    if matched_fail_severity:
+        reasons.append(
+            f"Found {len(matched_fail_severity)} finding(s) at or above severity '{policy.fail_on_severity}'."
+        )
+
+
+
+
+
+
 
 
 
