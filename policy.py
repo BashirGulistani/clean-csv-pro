@@ -97,6 +97,26 @@ def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyRes
         )
 
 
+    if policy.budget.high is not None and counts["high"] > policy.budget.high:
+        reasons.append(
+            f"High severity budget exceeded: {counts['high']} > {policy.budget.high}."
+        )
+
+    if policy.budget.medium is not None and counts["medium"] > policy.budget.medium:
+        reasons.append(
+            f"Medium severity budget exceeded: {counts['medium']} > {policy.budget.medium}."
+        )
+
+    if policy.budget.low is not None and counts["low"] > policy.budget.low:
+        reasons.append(
+            f"Low severity budget exceeded: {counts['low']} > {policy.budget.low}."
+        )
+
+    if policy.budget.total is not None and counts["total"] > policy.budget.total:
+        reasons.append(
+            f"Total findings budget exceeded: {counts['total']} > {policy.budget.total}."
+        )
+
 
 
 
