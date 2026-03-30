@@ -95,3 +95,40 @@ class ScanPolicy:
 
 
 
+
+
+def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyResult:
+    items = list(findings)
+    counts = count_by_severity(items)
+
+    reasons: List[str] = []
+    triggered_rules: List[str] = []
+
+    fail_rank = SEVERITY_RANK.get(policy.fail_on_severity.lower(), 2)
+    matched_fail_severity = [
+        f for f in items if SEVERITY_RANK.get(str(getattr(f, "severity", "low")).lower(), 1) >= fail_rank
+    ]
+    if matched_fail_severity:
+        reasons.append(
+            f"Found {len(matched_fail_severity)} finding(s) at or above severity '{policy.fail_on_severity}'."
+        )
+
+    if policy.budget.high is not None and counts["high"] > policy.budget.high:
+        reasons.append(
+            f"High severity budget exceeded: {counts['high']} > {policy.budget.high}."
+        )
+
+    if policy.budget.medium is not None and counts["medium"] > policy.budget.medium:
+        reasons.append(
+            f"Medium severity budget exceeded: {counts['medium']} > {policy.budget.medium}."
+        )
+
+
+
+
+
+
+
+
+
+
