@@ -127,6 +127,34 @@ def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyRes
 
 
 
+    if policy.budget.low is not None and counts["low"] > policy.budget.low:
+        reasons.append(
+            f"Low severity budget exceeded: {counts['low']} > {policy.budget.low}."
+        )
+
+    if policy.budget.total is not None and counts["total"] > policy.budget.total:
+        reasons.append(
+            f"Total findings budget exceeded: {counts['total']} > {policy.budget.total}."
+        )
+
+    fail_on_rules_set = {x.strip().upper() for x in policy.fail_on_rules if str(x).strip()}
+    if fail_on_rules_set:
+        matched_rules = sorted({
+            str(getattr(f, "rule_id", "")).upper()
+            for f in items
+            if str(getattr(f, "rule_id", "")).upper() in fail_on_rules_set
+        })
+        if matched_rules:
+            triggered_rules.extend(matched_rules)
+            reasons.append(
+                f"Blocked rule(s) present: {', '.join(matched_rules)}."
+            )
+
+
+
+
+
+
 
 
 
