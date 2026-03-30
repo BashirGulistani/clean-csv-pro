@@ -153,6 +153,38 @@ def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyRes
 
 
 
+    if policy.max_hotspot_findings is not None:
+        worst_file, worst_count = worst_hotspot(items)
+        if worst_count > policy.max_hotspot_findings:
+            reasons.append(
+                f"Hotspot limit exceeded: file '{worst_file}' has {worst_count} findings "
+                f"(limit {policy.max_hotspot_findings})."
+            )
+
+    passed = len(reasons) == 0
+
+    return PolicyResult(
+        passed=passed,
+        reasons=reasons,
+        counts=counts,
+        triggered_rules=sorted(set(triggered_rules)),
+    )
+
+
+def count_by_severity(findings: Iterable[object]) -> Dict[str, int]:
+    counts = {"high": 0, "medium": 0, "low": 0, "total": 0}
+    for f in findings:
+        sev = str(getattr(f, "severity", "low")).lower()
+        if sev not in counts:
+            sev = "low"
+        counts[sev] += 1
+        counts["total"] += 1
+    return counts
+
+
+
+
+
 
 
 
