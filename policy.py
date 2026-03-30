@@ -62,5 +62,36 @@ class PolicyResult:
 
 
 
+        if self.triggered_rules:
+            lines.append("- triggered rules:")
+            for rule in self.triggered_rules:
+                lines.append(f"  - {rule}")
+
+        return "\n".join(lines)
+
+
+@dataclass
+class ScanPolicy:
+    fail_on_severity: str = "medium"
+    budget: PolicyBudget = field(default_factory=PolicyBudget)
+    fail_on_rules: List[str] = field(default_factory=list)
+    warn_on_rules: List[str] = field(default_factory=list)
+    max_hotspot_findings: Optional[int] = None
+
+    def to_dict(self) -> Dict[str, object]:
+        return {
+            "fail_on_severity": self.fail_on_severity,
+            "budget": self.budget.to_dict(),
+            "fail_on_rules": list(self.fail_on_rules),
+            "warn_on_rules": list(self.warn_on_rules),
+            "max_hotspot_findings": self.max_hotspot_findings,
+        }
+
+
+
+
+
+
+
 
 
