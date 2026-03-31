@@ -7,11 +7,6 @@ from typing import Dict, Iterable, List, Optional
 SEVERITY_RANK = {"low": 1, "medium": 2, "high": 3}
 
 
-
-
-
-
-
 @dataclass
 class PolicyBudget:
     high: Optional[int] = None
@@ -26,10 +21,6 @@ class PolicyBudget:
             "low": self.low,
             "total": self.total,
         }
-
-
-
-
 
 
 @dataclass
@@ -58,10 +49,6 @@ class PolicyResult:
             for reason in self.reasons:
                 lines.append(f"  - {reason}")
 
-
-
-
-
         if self.triggered_rules:
             lines.append("- triggered rules:")
             for rule in self.triggered_rules:
@@ -86,15 +73,6 @@ class ScanPolicy:
             "warn_on_rules": list(self.warn_on_rules),
             "max_hotspot_findings": self.max_hotspot_findings,
         }
-
-
-
-
-
-
-
-
-
 
 
 def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyResult:
@@ -123,10 +101,6 @@ def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyRes
             f"Medium severity budget exceeded: {counts['medium']} > {policy.budget.medium}."
         )
 
-
-
-
-
     if policy.budget.low is not None and counts["low"] > policy.budget.low:
         reasons.append(
             f"Low severity budget exceeded: {counts['low']} > {policy.budget.low}."
@@ -149,9 +123,6 @@ def evaluate_policy(findings: Iterable[object], policy: ScanPolicy) -> PolicyRes
             reasons.append(
                 f"Blocked rule(s) present: {', '.join(matched_rules)}."
             )
-
-
-
 
     if policy.max_hotspot_findings is not None:
         worst_file, worst_count = worst_hotspot(items)
@@ -182,13 +153,127 @@ def count_by_severity(findings: Iterable[object]) -> Dict[str, int]:
     return counts
 
 
+def findings_by_rule(findings: Iterable[object]) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    for f in findings:
+        rule_id = str(getattr(f, "rule_id", "UNKNOWN")).upper()
+        out[rule_id] = out.get(rule_id, 0) + 1
+    return out
 
 
+def findings_by_file(findings: Iterable[object]) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    for f in findings:
+        file = str(getattr(f, "file", "__inventory__"))
+        out[file] = out.get(file, 0) + 1
+    return out
 
 
+def worst_hotspot(findings: Iterable[object]) -> tuple[str, int]:
+    by_file = findings_by_file(findings)
+    if not by_file:
+        return ("", 0)
+    file, count = sorted(by_file.items(), key=lambda x: (-x[1], x[0]))[0]
+    return file, count
 
 
+def render_policy_markdown(result: PolicyResult, title: str = "ThemeAudit Policy Result") -> str:
+    lines: List[str] = []
+    lines.append(f"# {title}")
+    lines.append("")
+    lines.append(f"- Passed: **{'Yes' if result.passed else 'No'}**")
+    lines.append(
+        f"- Counts: high={result.counts.get('high', 0)}, "
+        f"medium={result.counts.get('medium', 0)}, "
+        f"low={result.counts.get('low', 0)}, "
+        f"total={result.counts.get('total', 0)}"
+    )
+    lines.append("")
+
+    if result.reasons:
+        lines.append("## Reasons")
+        lines.append("")
+        for reason in result.reasons:
+            lines.append(f"- {reason}")
+        lines.append("")
+
+    if result.triggered_rules:
+        lines.append("## Triggered Rules")
+        lines.append("")
+        for rule in result.triggered_rules:
+            lines.append(f"- `{rule}`")
+        lines.append("")
+
+    if not result.reasons:
+        lines.append("No policy violations found.")
+        lines.append("")
+
+    return "\n".join(lines)
 
 
+def make_default_policy() -> ScanPolicy:
+    return ScanPolicy(
+        fail_on_severity="medium",
+        budget=PolicyBudget(
+            high=0,
+            medium=20,
+            low=100,
+            total=120,
+        ),
+        fail_on_rules=["A11Y001", "PERF002"],
+        warn_on_rules=["PERF001", "PERF010"],
+        max_hotspot_findings=25,
+    )
 
 
+def parse_policy_dict(data: Dict[str, object]) -> ScanPolicy:
+    budget_raw = data.get("budget", {})
+    if not isinstance(budget_raw, dict):
+        budget_raw = {}
+
+    budget = PolicyBudget(
+        high=_maybe_int(budget_raw.get("high")),
+        medium=_maybe_int(budget_raw.get("medium")),
+        low=_maybe_int(budget_raw.get("low")),
+        total=_maybe_int(budget_raw.get("total")),
+    )
+
+    fail_on_rules = _normalize_str_list(data.get("fail_on_rules", []))
+    warn_on_rules = _normalize_str_list(data.get("warn_on_rules", []))
+
+    fail_on_severity = str(data.get("fail_on_severity", "medium")).strip().lower()
+    if fail_on_severity not in {"low", "medium", "high"}:
+        fail_on_severity = "medium"
+
+    return ScanPolicy(
+        fail_on_severity=fail_on_severity,
+        budget=budget,
+        fail_on_rules=fail_on_rules,
+        warn_on_rules=warn_on_rules,
+        max_hotspot_findings=_maybe_int(data.get("max_hotspot_findings")),
+    )
+
+
+def render_policy_json(policy: ScanPolicy) -> str:
+    import json
+    return json.dumps(policy.to_dict(), indent=2)
+
+
+def _maybe_int(value: object) -> Optional[int]:
+    if value is None or value == "":
+        return None
+    try:
+        return int(value)
+    except Exception:
+        return None
+
+
+def _normalize_str_list(value: object) -> List[str]:
+    if not isinstance(value, list):
+        return []
+    out: List[str] = []
+    for item in value:
+        s = str(item).strip()
+        if s:
+            out.append(s.upper())
+    return out
