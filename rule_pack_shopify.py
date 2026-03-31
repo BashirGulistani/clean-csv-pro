@@ -97,5 +97,17 @@ def rule_missing_section_schema(file: str, text: str, inv) -> List:
     return out
 
 
+# -------------------------
+# Export Shopify rule pack
+# -------------------------
+SHOPIFY_RULES = [
+    Rule(
+        id="SHOP001",
+        title="Missing preconnect to Shopify CDN",
+        applies_to="text",
+        severity="medium",
+        description="Checks for missing preconnect to Shopify CDN.",
+        check=rule_missing_preconnect,
+    ),
 
 
