@@ -110,4 +110,28 @@ SHOPIFY_RULES = [
         check=rule_missing_preconnect,
     ),
 
-
+    Rule(
+        id="SHOP002",
+        title="Large theme.js file",
+        applies_to="text",
+        severity="high",
+        description="Detects large theme.js files.",
+        check=rule_large_theme_js,
+    ),
+    Rule(
+        id="SHOP003",
+        title="Excessive Liquid render calls",
+        applies_to="text",
+        severity="medium",
+        description="Detects too many Liquid render calls.",
+        check=rule_excessive_liquid_render,
+    ),
+    Rule(
+        id="SHOP004",
+        title="Missing section schema",
+        applies_to="text",
+        severity="low",
+        description="Checks if Shopify sections include schema.",
+        check=rule_missing_section_schema,
+    ),
+]
