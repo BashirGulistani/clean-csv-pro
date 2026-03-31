@@ -58,3 +58,24 @@ def rule_large_theme_js(file: str, text: str, inv) -> List:
     return out
 
 
+# -------------------------
+# Rule: Excessive Liquid render usage
+# -------------------------
+def rule_excessive_liquid_render(file: str, text: str, inv) -> List:
+    out = []
+    matches = LIQUID_RENDER_RE.findall(text)
+    if len(matches) > 20:
+        out.append(
+            make_finding(
+                "SHOP003",
+                "medium",
+                "Excessive Liquid render calls",
+                f"Found {len(matches)} render calls in a single file.",
+                file=file,
+                help="Too many render calls can slow down server-side rendering.",
+            )
+        )
+    return out
+
+
+
