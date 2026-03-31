@@ -77,5 +77,25 @@ def rule_excessive_liquid_render(file: str, text: str, inv) -> List:
         )
     return out
 
+# -------------------------
+# Rule: Missing schema in section
+# -------------------------
+def rule_missing_section_schema(file: str, text: str, inv) -> List:
+    out = []
+    if file.startswith("sections/"):
+        if not SECTION_SCHEMA_RE.search(text):
+            out.append(
+                make_finding(
+                    "SHOP004",
+                    "low",
+                    "Section missing schema",
+                    "Shopify section is missing {% schema %}.",
+                    file=file,
+                    help="Schema enables customization in the theme editor.",
+                )
+            )
+    return out
+
+
 
 
