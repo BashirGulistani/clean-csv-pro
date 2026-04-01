@@ -35,7 +35,27 @@ class RuleEngine:
 
         if extra_rules:
             self.rules.extend(extra_rules)
+    def get_rules(self) -> List[Rule]:
+        return self.rules
 
+    def filter_rules(
+        self,
+        enabled_rule_ids: List[str] | None = None,
+        disabled_rule_ids: List[str] | None = None,
+    ) -> List[Rule]:
+        rules = self.rules
+
+        if enabled_rule_ids:
+            enabled_set = {r.upper() for r in enabled_rule_ids}
+            rules = [r for r in rules if r.id.upper() in enabled_set]
+
+        if disabled_rule_ids:
+            disabled_set = {r.upper() for r in disabled_rule_ids}
+            rules = [r for r in rules if r.id.upper() not in disabled_set]
+
+        return rules
+
+ 
 
 
 
