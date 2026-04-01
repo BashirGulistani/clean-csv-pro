@@ -13,6 +13,25 @@ LIQUID_RENDER_RE = re.compile(r"{%\s*render\s+", re.IGNORECASE)
 SECTION_SCHEMA_RE = re.compile(r"{%\s*schema\s*%}", re.IGNORECASE)
 
 
+# -------------------------
+# Rule: Missing preconnect to Shopify CDN
+# -------------------------
+def rule_missing_preconnect(file: str, text: str, inv) -> List:
+    out = []
+    if "cdn.shopify.com" in text.lower():
+        if "rel=\"preconnect\"" not in text.lower():
+            out.append(
+                make_finding(
+                    "SHOP001",
+                    "medium",
+                    "Missing preconnect to Shopify CDN",
+                    "Consider adding <link rel=\"preconnect\" href=\"https://cdn.shopify.com\"> for faster asset loading.",
+                    file=file,
+                    help="Preconnect can reduce latency for Shopify-hosted assets.",
+                )
+            )
+    return out
+
 
 
 
