@@ -35,4 +35,25 @@ def rule_missing_preconnect(file: str, text: str, inv) -> List:
 
 
 
+# -------------------------
+# Rule: Large theme.js detected
+# -------------------------
+def rule_large_theme_js(file: str, text: str, inv) -> List:
+    out = []
+    if RENDER_JS_RE.search(file):
+        size = len(text)
+        if size > 150_000:
+            out.append(
+                make_finding(
+                    "SHOP002",
+                    "high",
+                    "Large theme.js file",
+                    f"theme.js appears large (~{size:,} chars). Consider splitting or optimizing.",
+                    file=file,
+                    help="Large JS bundles hurt load performance and TTI.",
+                )
+            )
+    return out
+
+
 
