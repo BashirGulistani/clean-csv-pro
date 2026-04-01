@@ -97,6 +97,42 @@ def rule_missing_section_schema(file: str, text: str, inv) -> List:
     return out
 
 
-
+# -------------------------
+# Export Shopify rule pack
+# -------------------------
+SHOPIFY_RULES = [
+    Rule(
+        id="SHOP001",
+        title="Missing preconnect to Shopify CDN",
+        applies_to="text",
+        severity="medium",
+        description="Checks for missing preconnect to Shopify CDN.",
+        check=rule_missing_preconnect,
+    ),
+    Rule(
+        id="SHOP002",
+        title="Large theme.js file",
+        applies_to="text",
+        severity="high",
+        description="Detects large theme.js files.",
+        check=rule_large_theme_js,
+    ),
+    Rule(
+        id="SHOP003",
+        title="Excessive Liquid render calls",
+        applies_to="text",
+        severity="medium",
+        description="Detects too many Liquid render calls.",
+        check=rule_excessive_liquid_render,
+    ),
+    Rule(
+        id="SHOP004",
+        title="Missing section schema",
+        applies_to="text",
+        severity="low",
+        description="Checks if Shopify sections include schema.",
+        check=rule_missing_section_schema,
+    ),
+]
 
 
