@@ -14,5 +14,18 @@ except Exception:
 
 
 
+class RuleEngine:
+    """
+    Central rule engine that allows:
+    - core rules
+    - optional rule packs (Shopify, custom, etc.)
+    - dynamic enabling/disabling
+    """
+
+
+
+
+
+
 
 
