@@ -57,6 +57,21 @@ class RuleEngine:
 
 
 
+    def run_text_rules(self, file: str, text: str, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "text":
+                try:
+                    findings.extend(rule.check(file, text, inventory))
+                except Exception:
+                    # Fail-safe: don't crash scan
+                    continue
+        return findings
+
+
+
+
+
 
 
 
