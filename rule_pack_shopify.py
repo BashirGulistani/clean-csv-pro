@@ -33,8 +33,6 @@ def rule_missing_preconnect(file: str, text: str, inv) -> List:
     return out
 
 
-
-
 # -------------------------
 # Rule: Large theme.js detected
 # -------------------------
@@ -54,7 +52,6 @@ def rule_large_theme_js(file: str, text: str, inv) -> List:
                 )
             )
     return out
-
 
 
 # -------------------------
@@ -134,5 +131,3 @@ SHOPIFY_RULES = [
         check=rule_missing_section_schema,
     ),
 ]
-
-
