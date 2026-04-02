@@ -69,6 +69,21 @@ class RuleEngine:
         return findings
 
 
+    def run_asset_rules(self, file: str, path, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "asset":
+                try:
+                    findings.extend(rule.check(file, path, inventory))
+                except Exception:
+                    continue
+        return findings
+
+
+
+
+
+
 
 
 
