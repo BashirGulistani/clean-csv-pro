@@ -99,7 +99,15 @@ def create_default_engine() -> RuleEngine:
 
 
 
+def create_minimal_engine() -> RuleEngine:
+    return RuleEngine(include_shopify=False)
 
+
+def create_custom_engine(rule_ids: List[str]) -> RuleEngine:
+    engine = RuleEngine(include_shopify=True)
+    filtered = engine.filter_rules(enabled_rule_ids=rule_ids)
+    engine.rules = filtered
+    return engine
 
 
 
