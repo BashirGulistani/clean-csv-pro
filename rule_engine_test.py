@@ -74,6 +74,14 @@ class RuleEngine:
             if rule.applies_to == "asset":
 
 
+                try:
+                    findings.extend(rule.check(file, path, inventory))
+                except Exception:
+                    continue
+        return findings
+
+
+
 
 
 
