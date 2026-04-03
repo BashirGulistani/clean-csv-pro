@@ -28,6 +28,29 @@ class RuleEngine:
         self.rules: List[Rule] = list(RULES)
 
 
+        if include_shopify:
+            self.rules.extend(SHOPIFY_RULES)
+
+        if extra_rules:
+            self.rules.extend(extra_rules)
+
+    def get_rules(self) -> List[Rule]:
+        return self.rules
+
+    def filter_rules(
+        self,
+        enabled_rule_ids: List[str] | None = None,
+        disabled_rule_ids: List[str] | None = None,
+    ) -> List[Rule]:
+        rules = self.rules
+
+        if enabled_rule_ids:
+            enabled_set = {r.upper() for r in enabled_rule_ids}
+            rules = [r for r in rules if r.id.upper() in enabled_set]
+
+
+
+
 
 
 
