@@ -81,6 +81,21 @@ class RuleEngine:
         return findings
 
 
+    def run_cross_rules(self, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "cross":
+                try:
+                    findings.extend(rule.check("__inventory__", "", inventory))
+                except Exception:
+                    continue
+        return findings
+
+
+
+
+
+
 
 
 
