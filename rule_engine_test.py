@@ -51,6 +51,31 @@ class RuleEngine:
 
 
 
+        if disabled_rule_ids:
+            disabled_set = {r.upper() for r in disabled_rule_ids}
+            rules = [r for r in rules if r.id.upper() not in disabled_set]
+
+        return rules
+
+    def run_text_rules(self, file: str, text: str, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "text":
+                try:
+                    findings.extend(rule.check(file, text, inventory))
+                except Exception:
+                    # Fail-safe: don't crash scan
+                    continue
+        return findings
+
+    def run_asset_rules(self, file: str, path, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "asset":
+
+
+
+
 
 
 
