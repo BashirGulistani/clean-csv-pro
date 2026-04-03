@@ -12,6 +12,24 @@ except Exception:
 
 
 
+class RuleEngine:
+    """
+    Central rule engine that allows:
+    - core rules
+    - optional rule packs (Shopify, custom, etc.)
+    - dynamic enabling/disabling
+    """
+
+    def __init__(
+        self,
+        include_shopify: bool = True,
+        extra_rules: List[Rule] | None = None,
+    ):
+        self.rules: List[Rule] = list(RULES)
+
+
+
+
 
 
 
