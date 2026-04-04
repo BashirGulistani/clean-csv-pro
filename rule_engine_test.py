@@ -59,7 +59,60 @@ class RuleEngine:
 
 
 
+        if disabled_rule_ids:
+            disabled_set = {r.upper() for r in disabled_rule_ids}
+            rules = [r for r in rules if r.id.upper() not in disabled_set]
 
+        return rules
+
+    def run_text_rules(self, file: str, text: str, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "text":
+                try:
+                    findings.extend(rule.check(file, text, inventory))
+                except Exception:
+                    # Fail-safe: don't crash scan
+                    continue
+        return findings
+
+    def run_asset_rules(self, file: str, path, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "asset":
+                try:
+                    findings.extend(rule.check(file, path, inventory))
+                except Exception:
+                    continue
+        return findings
+
+    def run_cross_rules(self, inventory) -> List:
+        findings = []
+        for rule in self.rules:
+            if rule.applies_to == "cross":
+                try:
+                    findings.extend(rule.check("__inventory__", "", inventory))
+                except Exception:
+                    continue
+        return findings
+
+
+# -------------------------
+# Helper factory
+# -------------------------
+def create_default_engine() -> RuleEngine:
+    return RuleEngine(include_shopify=True)
+
+
+def create_minimal_engine() -> RuleEngine:
+    return RuleEngine(include_shopify=False)
+
+
+def create_custom_engine(rule_ids: List[str]) -> RuleEngine:
+    engine = RuleEngine(include_shopify=True)
+    filtered = engine.filter_rules(enabled_rule_ids=rule_ids)
+    engine.rules = filtered
+    return engine
 
 
 
