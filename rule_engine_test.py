@@ -9,4 +9,15 @@ from .rules import RULES, Rule
 
 
 
+# Optional Shopify pack
+try:
+    from .rule_pack_shopify import SHOPIFY_RULES
+except Exception:
+    SHOPIFY_RULES = []
+
+
+
+
+
+
 
