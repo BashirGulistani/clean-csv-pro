@@ -32,6 +32,25 @@ def build_extensions_parser() -> argparse.ArgumentParser:
 
 
 
+    # json
+    p_json = sub.add_parser("json", help="Scan a theme and write a JSON report")
+    p_json.add_argument("path", type=str, help="Path to theme directory")
+    p_json.add_argument("--out", type=str, default="themeaudit-report.json", help="Output JSON file")
+    p_json.add_argument("--max-files", type=int, default=5000)
+    p_json.add_argument("--max-bytes", type=int, default=15_000_000)
+
+    # baseline
+    p_base = sub.add_parser("baseline", help="Create a baseline file from current findings")
+    p_base.add_argument("path", type=str, help="Path to theme directory")
+    p_base.add_argument("--out", type=str, default=".themeaudit-baseline.json", help="Baseline output path")
+    p_base.add_argument("--max-files", type=int, default=5000)
+    p_base.add_argument("--max-bytes", type=int, default=15_000_000)
+
+    # compare baseline
+
+
+
+
 
 
 
