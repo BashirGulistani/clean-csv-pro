@@ -81,6 +81,30 @@ def build_extensions_parser() -> argparse.ArgumentParser:
 
 
 
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = build_extensions_parser()
+    args = parser.parse_args(argv)
+
+    if args.command == "html":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        out = Path(args.out).expanduser().resolve()
+        write_html_report(findings, str(out), theme_dir=str(theme_dir), title=args.title)
+        print(f"[ok] wrote HTML report: {out}")
+        return 0
+
+    if args.command == "json":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        out = Path(args.out).expanduser().resolve()
+        write_json_report(findings, out, theme_dir=str(theme_dir))
+        print(f"[ok] wrote JSON report: {out}")
+        return 0
+
+
+
+
+
 
 
 
