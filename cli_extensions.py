@@ -103,6 +103,47 @@ def main(argv: Optional[List[str]] = None) -> int:
 
 
 
+    if args.command == "baseline":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        out = Path(args.out).expanduser().resolve()
+        save_baseline(findings, out)
+        print(f"[ok] wrote baseline: {out}")
+        return 0
+
+    if args.command == "compare-baseline":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        summary = summarize_baseline_comparison(findings, args.baseline)
+        print(summary)
+        return 0
+
+    if args.command == "rules-docs":
+        out = Path(args.out).expanduser().resolve()
+        write_rules_markdown(out, title=args.title)
+        print(f"[ok] wrote rules docs: {out}")
+        return 0
+
+    if args.command == "init":
+        target = _resolve_dir(args.path)
+        findings = None
+        if args.with_baseline:
+            findings = _scan(target, args.max_files, args.max_bytes)
+
+        result = scaffold_project(
+            target_dir=target,
+            findings=findings,
+            overwrite=args.overwrite,
+            include_workflow=True,
+            include_readme_snippet=args.with_readme_snippet,
+        )
+        print(result.render_text())
+        return 0
+
+
+
+
+
 
 
 
