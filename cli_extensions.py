@@ -74,6 +74,55 @@ def build_extensions_parser() -> argparse.ArgumentParser:
     p_init.add_argument("--max-bytes", type=int, default=15_000_000)
 
 
+    # stats
+    p_stats = sub.add_parser("stats", help="Print theme statistics summary")
+    p_stats.add_argument("path", type=str, help="Path to theme directory")
+    p_stats.add_argument("--max-files", type=int, default=5000)
+    p_stats.add_argument("--max-bytes", type=int, default=15_000_000)
+
+    return parser
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    parser = build_extensions_parser()
+    args = parser.parse_args(argv)
+
+    if args.command == "html":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        out = Path(args.out).expanduser().resolve()
+        write_html_report(findings, str(out), theme_dir=str(theme_dir), title=args.title)
+        print(f"[ok] wrote HTML report: {out}")
+        return 0
+
+    if args.command == "json":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        out = Path(args.out).expanduser().resolve()
+        write_json_report(findings, out, theme_dir=str(theme_dir))
+        print(f"[ok] wrote JSON report: {out}")
+        return 0
+
+    if args.command == "baseline":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        out = Path(args.out).expanduser().resolve()
+        save_baseline(findings, out)
+        print(f"[ok] wrote baseline: {out}")
+        return 0
+
+    if args.command == "compare-baseline":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        summary = summarize_baseline_comparison(findings, args.baseline)
+        print(summary)
+        return 0
+
+
+
+
+
+
 
 
 
