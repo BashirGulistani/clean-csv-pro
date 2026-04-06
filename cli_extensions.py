@@ -121,6 +121,22 @@ def main(argv: Optional[List[str]] = None) -> int:
 
 
 
+    if args.command == "rules-docs":
+        out = Path(args.out).expanduser().resolve()
+        write_rules_markdown(out, title=args.title)
+        print(f"[ok] wrote rules docs: {out}")
+        return 0
+
+    if args.command == "init":
+        target = _resolve_dir(args.path)
+        findings = None
+        if args.with_baseline:
+            findings = _scan(target, args.max_files, args.max_bytes)
+
+
+
+
+
 
 
 
