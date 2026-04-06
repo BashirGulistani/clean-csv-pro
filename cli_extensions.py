@@ -137,7 +137,36 @@ def main(argv: Optional[List[str]] = None) -> int:
 
 
 
+        result = scaffold_project(
+            target_dir=target,
+            findings=findings,
+            overwrite=args.overwrite,
+            include_workflow=True,
+            include_readme_snippet=args.with_readme_snippet,
+        )
+        print(result.render_text())
+        return 0
 
+    if args.command == "stats":
+        theme_dir = _resolve_dir(args.path)
+        findings = _scan(theme_dir, args.max_files, args.max_bytes)
+        stats = compute_stats(findings)
+        print(summarize_stats(stats))
+        return 0
+
+    parser.print_help()
+    return 1
+
+
+def _resolve_dir(path_str: str) -> Path:
+    p = Path(path_str).expanduser().resolve()
+    if not p.exists() or not p.is_dir():
+        raise SystemExit(f"[error] not a directory: {p}")
+    return p
+
+
+def _scan(theme_dir: Path, max_files: int, max_bytes: int):
+    return scan_theme(theme_dir=theme_dir, max_files=max_files, max_bytes=max_bytes)
 
 
 
