@@ -52,4 +52,32 @@ def build_extensions_parser() -> argparse.ArgumentParser:
 
 
 
+    # compare baseline
+    p_compare = sub.add_parser("compare-baseline", help="Compare current scan against baseline")
+    p_compare.add_argument("path", type=str, help="Path to theme directory")
+    p_compare.add_argument("--baseline", type=str, default=".themeaudit-baseline.json", help="Baseline file")
+    p_compare.add_argument("--max-files", type=int, default=5000)
+    p_compare.add_argument("--max-bytes", type=int, default=15_000_000)
+
+    # rules docs
+    p_rules = sub.add_parser("rules-docs", help="Generate Markdown docs for rules")
+    p_rules.add_argument("--out", type=str, default="RULES.md", help="Output Markdown path")
+    p_rules.add_argument("--title", type=str, default="ThemeAudit Rules Reference")
+
+    # init
+    p_init = sub.add_parser("init", help="Scaffold ThemeAudit files into a repo")
+    p_init.add_argument("path", type=str, nargs="?", default=".", help="Target directory")
+    p_init.add_argument("--overwrite", action="store_true", help="Overwrite existing files")
+    p_init.add_argument("--with-baseline", action="store_true", help="Generate baseline from scan")
+    p_init.add_argument("--with-readme-snippet", action="store_true", help="Append ThemeAudit snippet to README")
+    p_init.add_argument("--max-files", type=int, default=5000)
+    p_init.add_argument("--max-bytes", type=int, default=15_000_000)
+
+
+
+
+
+
+
+
 
