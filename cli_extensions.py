@@ -19,3 +19,37 @@ from .stats import summarize_stats, compute_stats
 
 
 
+def build_extensions_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="themeauditx",
+        description="Extended CLI utilities for ThemeAudit",
+    )
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    # html
+    p_html = sub.add_parser("html", help="Scan a theme and write an HTML report")
+    p_html.add_argument("path", type=str, help="Path to theme directory")
+    p_html.add_argument("--out", type=str, default="themeaudit-report.html", help="Output HTML file")
+    p_html.add_argument("--title", type=str, default="ThemeAudit Report", help="Report title")
+    p_html.add_argument("--max-files", type=int, default=5000)
+    p_html.add_argument("--max-bytes", type=int, default=15_000_000)
+
+    # json
+    p_json = sub.add_parser("json", help="Scan a theme and write a JSON report")
+    p_json.add_argument("path", type=str, help="Path to theme directory")
+    p_json.add_argument("--out", type=str, default="themeaudit-report.json", help="Output JSON file")
+    p_json.add_argument("--max-files", type=int, default=5000)
+    p_json.add_argument("--max-bytes", type=int, default=15_000_000)
+
+    # baseline
+    p_base = sub.add_parser("baseline", help="Create a baseline file from current findings")
+    p_base.add_argument("path", type=str, help="Path to theme directory")
+    p_base.add_argument("--out", type=str, default=".themeaudit-baseline.json", help="Baseline output path")
+    p_base.add_argument("--max-files", type=int, default=5000)
+    p_base.add_argument("--max-bytes", type=int, default=15_000_000)
+
+
+
+
+
+
