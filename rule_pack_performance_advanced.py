@@ -122,6 +122,31 @@ def rule_missing_fetchpriority_hero(file: str, text: str, inv) -> List:
         if fetchpriority != "high":
             line = text[:m.start()].count("\n") + 1
 
+            out.append(
+                make_finding(
+                    "ADV004",
+                    "medium",
+                    "Likely hero image missing fetchpriority",
+                    "A likely above-the-fold image does not declare fetchpriority=\"high\".",
+                    file=file,
+                    line=line,
+                    help="For the main LCP image, fetchpriority=\"high\" can improve loading priority in supported browsers.",
+                )
+            )
+            break
+
+    return out
+
+
+def rule_excessive_background_images(file: str, text: str, inv) -> List:
+    out = []
+    hits = URL_RE.findall(text)
+    bg_count = 0
+    for raw in hits:
+        val = raw.strip().strip('"').strip("'").lower()
+        if any(ext in val for ext in (".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif", ".svg")):
+            bg_count += 1
+
 
 
 
