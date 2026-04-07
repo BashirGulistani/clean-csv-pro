@@ -72,6 +72,31 @@ def rule_too_many_third_party_scripts(file: str, text: str, inv) -> List:
         if not src:
             continue
         src_l = src.lower()
+        if src_l.startswith("http://") or src_l.startswith("https://") or src_l.startswith("//"):
+            count += 1
+            host = _extract_host(src_l)
+            if host:
+                third_party_hosts.add(host)
+
+    if count >= 5:
+        out.append(
+            make_finding(
+                "ADV003",
+                "high",
+                "Heavy third-party script usage",
+                f"Found {count} external script tags across {len(third_party_hosts)} host(s).",
+                file=file,
+                help="Third-party scripts often dominate performance cost. Audit necessity, loading strategy, and duplication.",
+            )
+        )
+    return out
+
+
+def rule_missing_fetchpriority_hero(file: str, text: str, inv) -> List:
+    out = []
+    hero_candidates = 0
+
+    for m in IMG_TAG_RE.finditer(text):
 
 
 
