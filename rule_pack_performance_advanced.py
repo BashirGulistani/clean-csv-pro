@@ -141,6 +141,19 @@ def rule_missing_fetchpriority_hero(file: str, text: str, inv) -> List:
 
 
 
+def rule_excessive_background_images(file: str, text: str, inv) -> List:
+    out = []
+    hits = URL_RE.findall(text)
+    bg_count = 0
+    for raw in hits:
+        val = raw.strip().strip('"').strip("'").lower()
+        if any(ext in val for ext in (".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif", ".svg")):
+            bg_count += 1
+
+
+
+
+
 
 
 
