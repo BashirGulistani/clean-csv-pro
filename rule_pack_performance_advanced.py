@@ -172,6 +172,43 @@ def rule_excessive_background_images(file: str, text: str, inv) -> List:
 
 
 
+def rule_duplicate_script_sources(file: str, text: str, inv) -> List:
+    out = []
+    seen = {}
+    duplicates = []
+
+    for m in SCRIPT_TAG_RE.finditer(text):
+        attrs = _attrs(m.group(0))
+        src = attrs.get("src", "").strip()
+        if not src:
+            continue
+        src_key = src.lower()
+        seen[src_key] = seen.get(src_key, 0) + 1
+
+    for src, count in seen.items():
+        if count > 1:
+            duplicates.append((src, count))
+
+    if duplicates:
+        dup_text = ", ".join(f"{src} x{count}" for src, count in duplicates[:3])
+        out.append(
+            make_finding(
+                "ADV006",
+                "high",
+                "Duplicate script includes",
+                f"Detected duplicate script sources in the same file: {dup_text}",
+                file=file,
+                help="Duplicate script loading wastes bandwidth and can cause double execution bugs.",
+            )
+        )
+
+    return out
+
+
+
+
+
+
 
 
 
