@@ -120,6 +120,31 @@ def rule_missing_fetchpriority_hero(file: str, text: str, inv) -> List:
             "banner" in alt
         )
 
+        if not likely_hero:
+            continue
+
+        hero_candidates += 1
+        fetchpriority = attrs.get("fetchpriority", "").lower()
+        if fetchpriority != "high":
+            line = text[:m.start()].count("\n") + 1
+            out.append(
+                make_finding(
+                    "ADV004",
+                    "medium",
+                    "Likely hero image missing fetchpriority",
+                    "A likely above-the-fold image does not declare fetchpriority=\"high\".",
+                    file=file,
+                    line=line,
+                    help="For the main LCP image, fetchpriority=\"high\" can improve loading priority in supported browsers.",
+                )
+            )
+            break
+
+    return out
+
+
+
+
 
 
 
