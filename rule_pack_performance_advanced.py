@@ -67,6 +67,63 @@ def rule_preload_stylesheet_hack(file: str, text: str, inv) -> List:
 
 
 
+def rule_too_many_third_party_scripts(file: str, text: str, inv) -> List:
+    out = []
+    count = 0
+    third_party_hosts = set()
+
+    for m in SCRIPT_TAG_RE.finditer(text):
+        attrs = _attrs(m.group(0))
+        src = attrs.get("src", "")
+        if not src:
+            continue
+        src_l = src.lower()
+        if src_l.startswith("http://") or src_l.startswith("https://") or src_l.startswith("//"):
+            count += 1
+            host = _extract_host(src_l)
+            if host:
+                third_party_hosts.add(host)
+
+    if count >= 5:
+        out.append(
+            make_finding(
+                "ADV003",
+                "high",
+                "Heavy third-party script usage",
+                f"Found {count} external script tags across {len(third_party_hosts)} host(s).",
+                file=file,
+                help="Third-party scripts often dominate performance cost. Audit necessity, loading strategy, and duplication.",
+            )
+        )
+    return out
+
+
+def rule_missing_fetchpriority_hero(file: str, text: str, inv) -> List:
+    out = []
+    hero_candidates = 0
+
+    for m in IMG_TAG_RE.finditer(text):
+        tag = m.group(0)
+        attrs = _attrs(tag)
+        src = attrs.get("src", "") or attrs.get("data-src", "")
+        if not src:
+            continue
+
+        cls = attrs.get("class", "").lower()
+        alt = attrs.get("alt", "").lower()
+
+        likely_hero = (
+            m.start() < 1800 or
+            "hero" in cls or
+            "banner" in cls or
+            "hero" in alt or
+            "banner" in alt
+        )
+
+
+
+
+
 
 
 
