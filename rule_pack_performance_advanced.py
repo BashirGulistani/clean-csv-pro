@@ -15,6 +15,18 @@ URL_RE = re.compile(r'url\((.*?)\)', re.IGNORECASE)
 
 
 
+def _attrs(tag: str) -> dict:
+    attrs = {}
+    for m in ATTR_RE.finditer(tag):
+        k = (m.group(1) or "").lower()
+        v = (m.group(2) or "").strip().strip('"').strip("'")
+        attrs[k] = v
+    return attrs
+
+
+
+
+
 
 
 
