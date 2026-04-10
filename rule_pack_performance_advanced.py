@@ -147,6 +147,34 @@ def rule_missing_fetchpriority_hero(file: str, text: str, inv) -> List:
 
 
 
+def rule_excessive_background_images(file: str, text: str, inv) -> List:
+    out = []
+    hits = URL_RE.findall(text)
+    bg_count = 0
+    for raw in hits:
+        val = raw.strip().strip('"').strip("'").lower()
+        if any(ext in val for ext in (".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif", ".svg")):
+            bg_count += 1
+
+    if bg_count >= 8:
+        out.append(
+            make_finding(
+                "ADV005",
+                "medium",
+                "Many CSS background images detected",
+                f"Found approximately {bg_count} image URL references in CSS or inline styles.",
+                file=file,
+                help="Background images can hide important media from optimization workflows like responsive images and lazy loading.",
+            )
+        )
+    return out
+
+
+
+
+
+
+
 
 
 
