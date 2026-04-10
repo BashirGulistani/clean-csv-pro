@@ -207,6 +207,35 @@ def rule_duplicate_script_sources(file: str, text: str, inv) -> List:
 
 
 
+def rule_too_many_eager_images(file: str, text: str, inv) -> List:
+    out = []
+    eager_count = 0
+
+    for m in IMG_TAG_RE.finditer(text):
+        attrs = _attrs(m.group(0))
+        loading = attrs.get("loading", "").lower()
+        if loading == "eager":
+            eager_count += 1
+
+    if eager_count >= 4:
+        out.append(
+            make_finding(
+                "ADV007",
+                "medium",
+                "Too many eager-loaded images",
+                f"Found {eager_count} images with loading=\"eager\".",
+                file=file,
+                help="Only a small number of critical images should be eager-loaded. Excess eager loading can hurt page performance.",
+            )
+        )
+    return out
+
+
+
+
+
+
+
 
 
 
